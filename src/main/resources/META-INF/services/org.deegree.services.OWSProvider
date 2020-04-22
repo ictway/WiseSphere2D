@@ -1,0 +1,3 @@
+com.ictway.wisesphere.services.wms.controller.SpWMSProvider
+com.ictway.wisesphere.services.wfs.SpWFSProvider
+com.ictway.wisesphere.services.wmts.SpWMTSProvider

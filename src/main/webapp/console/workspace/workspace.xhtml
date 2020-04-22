@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+
+		<h:panelGroup rendered="#{!logBean.loggedIn}">
+			<ui:include src="/console/jsf/accessForbidden.xhtml" />
+		</h:panelGroup>
+		<h:panelGroup rendered="#{logBean.loggedIn}">
+		
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+            <h:outputText styleClass="titel" value="#{labels.workspace_title}" />
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+            <li><h:outputLink value="#"><h:outputText value="#{labels.general_title}" /></h:outputLink></li>
+            <li class="active"><h:outputText value="#{labels.link_workspace}" /></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <div class="callout callout-info">
+            <!-- 
+            <h4>Tip!</h4>
+            <p>Add the fixed class to the body tag to get this layout. The fixed layout is your best option if your sidebar is bigger than your content because it prevents extra unwanted scrolling.</p>
+            -->
+            <ui:include src="/active.xhtml" />
+          </div>
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+            
+			<fieldset class="fieldset">
+				<table style="font-size: small" border="0">
+					<tr>
+						<td style=""><h:outputText value="#{labels.workspace_dir}" /></td>
+						<td />
+						<td style=""><h:outputText value="#{workspace.workspaceRoot}" /></td>
+					</tr>
+				</table>
+
+				<br /> <br />
+				<p class="fa fa-circle-o text-info"></p>&nbsp; 
+				<h:outputText styleClass="titel" value="#{labels.available_workspaces}" />
+				<table style="margin: 10px 0px; font-size: small" border="0">
+					<ui:repeat var="workspaceName" value="#{workspace.workspaceList}">
+						<h:panelGroup
+							rendered="#{workspace.activeWorkspace.name != workspaceName}">
+							<h:form>
+								<tr align="left" class="checkWorkspaceName">
+									<td><h:outputText value="#{workspaceName}" /></td>
+									<td style="padding-left:10px;padding-top:2px;"><h:commandButton styleClass="btn btn-success"
+											label="#{workspaceName}" value="#{labels.start_workspace}"
+											onclick="show();" action="#{workspace.startWorkspace}">
+											<f:setPropertyActionListener target="#{actionParams.param1}"
+												value="#{workspaceName}" />
+										</h:commandButton></td>
+									<td style="padding-left:4px;padding-top:2px;"><h:commandButton styleClass="btn btn-warning"
+											label="#{workspaceName}" onclick="return confirmDelete();"
+											value="#{labels.delete_workspace}"
+											action="#{workspace.deleteWorkspace}">
+											<f:setPropertyActionListener target="#{actionParams.param1}"
+												value="#{workspaceName}" />
+										</h:commandButton></td>
+								</tr>
+							</h:form>
+						</h:panelGroup>
+					</ui:repeat>
+				</table>
+
+				<br /> <br />
+				<p class="fa fa-circle-o text-info"></p>&nbsp; 
+				<h:outputText styleClass="titel" value="#{labels.import_an_official_workspace}" />
+				<table style="margin: 10px 0px; font-size: small" border="0">
+					<ui:repeat var="workspaceName"
+						value="#{workspaceSp.remoteWorkspaces}">
+						<h:form>
+							<tr align="left">
+								<td><h:outputText value="#{workspaceName}" /></td>
+								<td style="padding-left:4px;padding-top:2px;"><h:commandButton styleClass="btn btn-default"
+										label="#{workspaceName}" value="Import" onclick="show();"
+										action="#{workspaceSp.downloadWorkspace}">
+										<f:setPropertyActionListener target="#{actionParams.param1}"
+											value="#{workspaceName}" />
+									</h:commandButton></td>
+							</tr>
+						</h:form>
+					</ui:repeat>
+				</table>
+				<h:panelGroup rendered="#{empty workspace.remoteWorkspaces}">
+					<h:outputText styleClass="error"
+						value="#{labels.error_fetch_list_workspaces}" />
+				</h:panelGroup>
+
+				<br /> <br />
+				<p class="fa fa-circle-o text-info"></p>&nbsp;
+				<h:outputText styleClass="titel" value="#{labels.upload_workspace}" />
+
+				<h:form enctype="multipart/form-data">
+					<table style="margin: 10px 0px; font-size: small" border="0">
+						<tr>
+							<td><dg:inputFile value="#{workspace.upload}" /></td>
+							<td style="padding-left:4px;"><h:commandButton styleClass="btn btn-primary" value="#{labels.upload}"
+									onclick="show();" action="#{workspace.uploadWorkspace}" /></td>
+						</tr>
+					</table>
+				</h:form>
+				</fieldset>
+		
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+        </div><!-- /.content -->
+
+<script>
+$(function(){
+	$("input[type='file']").on("change", function(){
+		checkFileName();
+	});
+	
+	$( ".checkWorkspaceName" ).each(function( index ) {
+		var _this = $(this);
+		var workspaceName = _this.text();
+		
+		if (korTextCheck(workspaceName)) {
+// 			alert("작업공간 파일명에 한글을 포함할 수 없습니다.");
+			_this.remove();
+		}
+		
+	});
+	
+});
+</script>
+        
+        </h:panelGroup>
+		
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+<h:head>
+	<h:outputStylesheet name="styles.css" />
+	<h:outputStylesheet name="pleasewait.css" />
+	<h:outputStylesheet name="client.css" />
+</h:head>
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+            <h:outputText styleClass="titel" value="#{labels.genericClient_title}" />
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+            <li><h:outputLink value="#"><h:outputText value="#{labels.general_title}" /></h:outputLink></li>
+            <li class="active"><h:outputText value="#{labels.link_genericClient}" /></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+            
+	<h:form id="requestForm">
+		<table class="table">
+			<colgroup>
+				<col width="60"/>
+				<col width="60"/>
+				<col width="*"/>
+			</colgroup>
+			<tr>
+				<td rowspan="3"><h:outputText value="#{labels.label_choose}" styleClass="titel" /><br/></td>
+				<td>
+					<h:selectOneMenu id="servicesSel" styleClass="input-sm"
+						value="#{requestBean.selectedService}">
+						<f:selectItems value="#{requestBean.services}" var="service"
+							itemLabel="#{service}" itemValue="#{service}" />
+						<f:ajax render="requestProfilesSel requestsSel requestArea" />
+					</h:selectOneMenu>
+				</td>
+				<td>
+					<h:selectOneMenu id="requestProfilesSel" styleClass="input-sm"
+						value="#{requestBean.selectedReqProfile}"
+						style="margin-right: 20px;">
+						<f:selectItems value="#{requestBean.requestProfiles}"
+							var="requestProfile" itemLabel="#{requestProfile}"
+							itemValue="#{requestProfile}" />
+						<f:ajax render="requestsSel requestArea" />
+					</h:selectOneMenu>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<h:selectOneMenu id="requestsSel" styleClass="input-sm"
+						value="#{requestBean.selectedRequest}">
+						<f:selectItems value="#{requestBean.requests}" />
+						<f:ajax render="requestArea" />
+					</h:selectOneMenu>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="input-group">
+						<h:inputText value="#{requestBean.saveRequestName}" rendered="#{logBean.loggedIn}" styleClass="form-control" maxlength="120" />
+						<div class="input-group-btn">
+	                      	<h:commandButton value="#{labels.btn_add_request}" styleClass="btn btn-success"
+								action="#{requestBean.addRequest}" rendered="#{logBean.loggedIn}" />
+							<h:commandButton value="#{labels.btn_save_request}" styleClass="btn btn-primary"
+								action="#{requestBean.saveRequest}" rendered="#{logBean.loggedIn}" />
+							<h:commandButton value="#{labels.btn_delete_request}" styleClass="btn btn-warning"
+								action="#{requestBean.deleteRequest}"
+								rendered="#{logBean.loggedIn}" />
+	                    </div>
+	                </div>    
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<h:inputTextarea id="requestArea" value="#{requestBean.request}" styleClass="textarea" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<h:outputLabel value="URL: #{requestBean.endpoint}/" for="workspaceService" />
+					<h:selectOneMenu id="workspaceService"   styleClass="input-sm"
+						value="#{requestBean.workspaceService}"
+						style="margin-right: 20px;">
+						<f:selectItems value="#{requestBean.workspaceServices}" 
+							var="workspaceService" itemLabel="#{workspaceService}"
+							itemValue="#{workspaceService}" />
+					</h:selectOneMenu>
+					<h:commandButton id="sendBt" value="send" styleClass="btn btn-primary" style="text-align: right;"
+						action="#{requestBean.sendRequest}">
+						<f:ajax execute="workspaceService requestArea"
+							render="sendMgs result downloadLink" onevent="blockInput" />
+					</h:commandButton>
+				</td>
+			</tr>
+		</table>
+		<h:panelGroup style="width: 95%; margin-left: 2%; margin-right: 2%;">
+			<h:panelGrid>
+				<h:column>
+					<h:messages id="sendMgs" errorClass="errorMsg" />
+				</h:column>
+				<h:column>
+					<h:panelGroup id="downloadLink">
+						<h:outputLink styleClass="naviExtern"
+							value="#{facesContext.externalContext.requestContextPath}/console/client/download.jsp?#{requestBean.dlparams}"
+							rendered="#{requestBean.response != null}">
+							<h:outputText value="#{labels.download_response}" />
+						</h:outputLink>
+					</h:panelGroup>
+				</h:column>
+				<h:column
+					style="width: 95%; margin-top: 20px; border-top: 1px solid black; padding-top: 20px;">
+					<h:panelGroup id="result">
+						<h:panelGroup>
+							<dg:outputXML id="response" value="#{requestBean.response}"
+								downloadable="false" rendered="#{requestBean.response != null}" />
+							<h:outputText id="hint"
+								value="#{labels.client_download_hint}"
+								rendered="#{requestBean.response == null}" />
+						</h:panelGroup>
+					</h:panelGroup>
+				</h:column>
+				<h:column>
+					<h:graphicImage id="mapImage"
+						value="#{requestBean.targetUrl}?#{requestBean.kvpRequestSel}"
+						render="#{requestBean.kvpRequestIsImage}" />
+				</h:column>
+			</h:panelGrid>
+		</h:panelGroup>
+	</h:form>
+		
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+        </div><!-- /.content -->
+		
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

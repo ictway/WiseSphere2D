@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+	
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+            <h:outputText styleClass="welcomeText" value="#{labels.welcome}" />
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li class="active"><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+              <!-- 내용 시작 -->
+
+				<h:panelGroup rendered="#{logBean.loggedIn}">
+					<h:panelGroup styleClass="welcomeText">
+						<br />
+						<p class="fa fa-circle-o text-info"></p>&nbsp;
+						<h:outputText styleClass="titel" value="#{labels.console_guide_title_general}" />
+						<ul>
+							<li><h:outputText value="#{labels.link_workspace}" /> : <h:outputText value="#{labels.console_guide_workspace}" /></li>
+							<!-- <li><h:outputText value="#{labels.link_proxy}" /> : <h:outputText value="#{labels.console_guide_proxy}" /></li> -->
+							<!-- <li><h:outputText value="#{labels.link_moduleinfo}" /> : <h:outputText value="#{labels.console_guide_module}" /></li> -->
+							<!--<li><h:outputText value="#{labels.link_genericClient}" /> : <h:outputText value="#{labels.console_guide_request}" /></li> -->
+							<li><h:outputText value="#{labels.link_wmsClient}" />: <h:outputText value="#{labels.console_guide_wms_layer}" /></li>
+						</ul>
+						<p class="fa fa-circle-o text-info"></p>&nbsp;
+						<h:outputText styleClass="titel" value="#{labels.console_guide_title_left}" />
+						<ul>
+							<li><h:outputText value="#{labels.web_services_title}" /> : <h:outputText value="#{labels.console_guide_webservice}" /></li>
+							<li><h:outputText value="#{labels.data_stores_title}" /> : <h:outputText value="#{labels.console_guide_datastores}" /></li>
+							<li><h:outputText value="#{labels.map_layers_title}" /> : <h:outputText value="#{labels.console_guide_maplayers}" /></li>
+							<li><h:outputText value="#{labels.server_connection_title}" /> : <h:outputText value="#{labels.console_guide_serverconn}" /></li>
+							<!--<li><h:outputText value="#{labels.processes_title}" /> : <h:outputText value="#{labels.console_guide_processes}" /></li>-->
+						</ul>
+					</h:panelGroup>
+					<br />
+				</h:panelGroup>
+
+				<h:panelGroup rendered="#{!logBean.loggedIn}">
+					<h:panelGroup styleClass="welcomeText">
+						<br /><br />
+						<div style="width:100%;height:300px;text-align:center;">
+							<h:outputText value="#{labels.access_forbidden}" />
+						</div>
+					</h:panelGroup>
+				</h:panelGroup>
+						
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+
+        </div><!-- /.content -->
+        	
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

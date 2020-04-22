@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+		
+        <h:panelGroup rendered="#{!logBean.loggedIn}">
+			<ui:include src="/console/jsf/accessForbidden.xhtml" />
+		</h:panelGroup>
+		<h:panelGroup rendered="#{logBean.loggedIn}">
+
+			<fieldset class="fieldset">
+	
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+            <h:outputText styleClass="titel" value="#{configManager.currentResourceManager.name}" />&nbsp;
+            <!-- small></small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'jdbc' or configManager.currentResourceManager.name == 'remote ows'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.server_connection_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'provider'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.processes_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'services'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.web_services_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'layers' or configManager.currentResourceManager.name == 'styles'
+            							or configManager.currentResourceManager.name == 'themes'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.map_layers_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'coverages' or configManager.currentResourceManager.name == 'feature'
+            							or configManager.currentResourceManager.name == 'metadata' or configManager.currentResourceManager.name == 'tile'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.data_stores_title}" /></h:outputLink></li>
+           </h:panelGroup> 
+            <li class="active"><h:outputText value="#{configManager.currentResourceManager.name}" /></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+              <!-- 내용 시작 -->
+
+			    <h:panelGroup rendered="#{configManager.currentResourceManager == null &amp;&amp; logBean.loggedIn}">
+			      <h:panelGroup styleClass="welcomeText">
+						<br /><br />
+						<div style="width:100%;height:300px;text-align:center;">
+							<h:outputText value="#{labels.please_use_left_links}" />
+						</div>
+				   </h:panelGroup>
+			    </h:panelGroup>
+			    <h:panelGroup rendered="#{logBean.loggedIn &amp;&amp; configManager.currentResourceManager != null}">
+			        <h:form>
+			        <div>
+			        <p>
+			          <h:outputText value="#{labels.place_your_schema_files_here}" />
+			          <br/>
+			          <h:outputText styleClass="titel" value="#{mappingWizardSQL.appSchemaDirectory}" />
+			          <br/>
+			        </p>
+			        <h:panelGroup id="schemaFiles">
+			          <h:panelGroup rendered="#{empty mappingWizardSQL.availableAppSchemaFiles}">
+			            <p>
+			              <h:outputText value="#{labels.no_schema_files_found}" /> <h:commandLink styleClass="btn btn-default" value="Rescan" ><f:ajax render="schemaFiles"/></h:commandLink>
+			            </p>
+			          </h:panelGroup>
+			          <h:panelGroup rendered="#{! empty mappingWizardSQL.availableAppSchemaFiles}">
+			            <p>Choose one or more schema file(s). <h:commandLink styleClass="btn btn-default" value="Rescan" ><f:ajax render="schemaFiles"/></h:commandLink>
+			            <br/>
+			            <div style="margin-left:20px;">
+				            <h:selectManyCheckbox styleClass="checkbox" value="#{mappingWizardSQL.selectedAppSchemaFiles}" layout="pageDirection">
+				              <f:selectItems value="#{mappingWizardSQL.availableAppSchemaFiles}" />
+				            </h:selectManyCheckbox>
+			            </div>
+			            </p>
+			          </h:panelGroup>
+			        </h:panelGroup>        
+			        </div>
+			        <div>
+			          <h:commandButton styleClass="btn btn-default" style="margin-right:6px;" value="#{labels.back}" action="/console/featurestore/sql/wizard" />
+			          <h:commandButton styleClass="btn btn-primary" value="#{labels.next}" action="#{mappingWizardSQL.analyzeSchema}" onclick="show();" />
+			        </div>
+			      </h:form>
+			    </h:panelGroup>
+		
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+
+        </div><!-- /.content -->
+        	
+		
+		</fieldset>
+		
+	</h:panelGroup>
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

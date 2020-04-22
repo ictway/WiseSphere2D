@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+
+        <h:panelGroup rendered="#{!logBean.loggedIn}">
+			<ui:include src="/console/jsf/accessForbidden.xhtml" />
+		</h:panelGroup>
+		<h:panelGroup rendered="#{logBean.loggedIn}">
+			<fieldset class="fieldset">
+	
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+           <h:outputText styleClass="titel" value="#{configManager.currentResourceManager.name}" />&nbsp;         
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'jdbc' or configManager.currentResourceManager.name == 'remote ows'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.server_connection_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'provider'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.processes_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'services'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.web_services_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'layers' or configManager.currentResourceManager.name == 'styles'
+            							or configManager.currentResourceManager.name == 'themes'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.map_layers_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'coverages' or configManager.currentResourceManager.name == 'feature'
+            							or configManager.currentResourceManager.name == 'metadata' or configManager.currentResourceManager.name == 'tile'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.data_stores_title}" /></h:outputLink></li>
+           </h:panelGroup> 
+            <li class="active"><h:outputText value="#{configManager.currentResourceManager.name}" /></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+		  <div class="callout callout-info">
+            <!-- 
+            <h4>Tip!</h4>
+            <p>Add the fixed class to the body tag to get this layout. The fixed layout is your best option if your sidebar is bigger than your content because it prevents extra unwanted scrolling.</p>
+            -->
+            <ui:include src="/active.xhtml" />
+          </div>        
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+              <!-- 내용 시작 -->
+
+				<h:panelGroup
+					rendered="#{configManager.currentResourceManager == null &amp;&amp; logBean.loggedIn}">
+					<h:panelGroup styleClass="welcomeText">
+						<br /><br />
+						<div style="width:100%;height:300px;text-align:center;">
+							<h:outputText value="#{labels.please_use_left_links}" />
+						</div>
+					</h:panelGroup>		
+				</h:panelGroup>
+				<h:panelGroup
+					rendered="#{logBean.loggedIn &amp;&amp; configManager.currentResourceManager != null}">
+					<fieldset class="fieldset">
+						<!-- legend>
+							<h:outputText value="#{configManager.currentResourceManager.name}" />
+						</legend -->
+						<h:panelGroup rendered="#{configManager.currentResourceManager.name != 'services'}">
+						<h:form onsubmit="checkResources(this)">
+							<ul class="todo-list">
+								<li>
+									<table>
+										<tr>
+											<td style="padding-right:10px;">
+												<h:outputLabel styleClass="text" for="newFSBt" value="#{labels.featureStores_name}" />
+											</td>
+											<td style="padding-right:10px;">
+												<h:inputText styleClass="form-control" style="width:180px;" id="newFSBt"
+													value="#{configManager.newConfigId}" size="16" required="true"
+													requiredMessage="#{labels.resource_name_req}" maxlength="120" />
+											</td>
+											<!-- td style display none 추가...BY_JIN -->
+											<td style="padding-right:10px; display: none;">
+												<h:selectOneMenu styleClass="input-sm"
+													value="#{configManager.newConfigType}"
+													rendered="#{configManager.currentResourceManager.multipleProviders}">
+													<f:selectItems
+														value="#{configManager.currentResourceManager.providerNames}" />
+												</h:selectOneMenu>
+											</td>
+											<td style="padding-right:10px;">
+												<h:commandButton styleClass="btn btn-primary" value="신규 #{fn:substring(configManager.currentResourceManager.name,0,fn:length(configManager.currentResourceManager.name)-1)} 생성" 
+												action="#{configManager.startWizard}" rendered="#{fn:endsWith(configManager.currentResourceManager.name,'s')}" />
+												<h:commandButton styleClass="btn btn-primary" value="신규 #{configManager.currentResourceManager.name} 생성" 
+												action="#{configManager.startWizard}" rendered="#{!fn:endsWith(configManager.currentResourceManager.name,'s')}" />
+											</td>
+										</tr>
+									</table>	
+								</li>
+							</ul>
+						</h:form>
+						</h:panelGroup>
+						<h:form>
+							<table class="table" style="width:60%; margin-top:20px;" border="0"> 
+								<colgroup>
+									<col width="50" />
+									<col width="160" />
+									<col width="*" />
+								</colgroup>
+								<ui:repeat value="#{configManager.availableResources}" var="config">
+								<h:panelGroup rendered="#{configManager.currentResourceManager.name!='tile' 
+								or (configManager.currentResourceManager.name=='tile' &amp;&amp; !fn:startsWith(config.id,'tilematrixset'))}">
+									<tr align="left">
+										<td>
+											<h:outputLabel styleClass="label label-success"
+												rendered="#{config.state=='init_ok'}"
+												value="#{labels.featureStores_deactivate}" /> 
+											<h:outputLabel
+												styleClass="label label-warning"
+												rendered="#{config.state=='deactivated'}"
+												value="#{labels.featureStores_activate}" /> 
+											<h:outputLabel
+												styleClass="label label-danger"
+												rendered="#{config.state=='init_error'}" value="!" />
+										</td>
+										<!-- id 추가...BY_JIN -->
+										<td class="configId"><h:outputText value="#{config.id}" /></td> 
+										<td>
+											<div class="input-group-btn">
+												<h:commandButton styleClass="btn btn-warning" style="width:110px;"
+													rendered="#{config.state!='deactivated'}" value="#{labels.btn_deactivate}"
+													action="#{config.deactivate}" /> 
+												<h:commandButton styleClass="btn btn-success" style="width:110px;"
+													rendered="#{config.state=='deactivated'}" value="#{labels.btn_activate}"
+													action="#{config.activate}" />
+												<h:commandButton styleClass="btn btn-default" style="width:70px;"
+													value="#{labels.featureStores_edit}" action="#{config.edit}" />
+												<h:commandButton styleClass="btn btn-default" style="width:70px;"
+													value="#{labels.featureStores_delete}"
+													action="#{config.delete}" onclick="return confirmDelete();"
+													rendered="#{configManager.currentResourceManager.name != 'services'}"/>
+												<h:commandButton styleClass="btn btn-default" style="width:100px;"
+													rendered="#{config.state=='init_error'}" value="#{labels.btn_show_errors}"
+													action="#{config.showErrors}" />
+											</div>		
+										</td>
+										<ui:insert name="extraButtons" />
+									</tr>
+								</h:panelGroup>
+								</ui:repeat>
+							</table>
+							<br />
+						</h:form>
+						<h:form>
+							<ui:insert name="extraConfig" />
+						</h:form>
+					</fieldset>
+				</h:panelGroup>
+		
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+
+        </div><!-- /.content -->
+        	
+		
+		</fieldset>
+		
+	</h:panelGroup>
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

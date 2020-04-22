@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+<h:head>
+	<h:outputStylesheet name="client.css" />
+</h:head>
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+		
+		<script type="text/javascript" src="CodeMirror-0.94/js/codemirror.js"></script>
+	<script type="text/javascript">
+	    var editor
+	    function activateEditor(){
+	        editor = CodeMirror.fromTextArea("xmlForm:inputXML", {
+	          parserfile: "parsexml.js",
+	          path: "CodeMirror-0.94/js/",
+	          stylesheet: "CodeMirror-0.94/css/xmlcolors.css"
+	        })
+	        var p = document.getElementById("highlighting")
+	        p.parentNode.removeChild(p)
+	    }
+	    function save(){
+	        editor &amp;&amp; editor.toTextArea()
+	    }
+	</script>
+		
+        <h:panelGroup rendered="#{!logBean.loggedIn}">
+			<ui:include src="/console/jsf/accessForbidden.xhtml" />
+		</h:panelGroup>
+		<h:panelGroup rendered="#{logBean.loggedIn}">
+
+			<fieldset class="fieldset">
+	
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+	          <h:panelGroup rendered="#{configManager.currentResourceManager.name != null}">
+	            <h:outputText styleClass="titel" value="#{configManager.currentResourceManager.name}" />
+	          </h:panelGroup>
+	          <h:panelGroup rendered="#{configManager.currentResourceManager.name == null}">
+	          	<h:panelGroup rendered="#{editConfig.location.name == 'proxy.xml'}">
+	          		<h:outputText styleClass="titel" value="#{labels.proxy_title}" />
+	          	</h:panelGroup>
+	          </h:panelGroup> &nbsp;
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'jdbc' or configManager.currentResourceManager.name == 'remote ows'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.server_connection_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'provider'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.processes_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'services'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.web_services_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'layers' or configManager.currentResourceManager.name == 'styles'
+            							or configManager.currentResourceManager.name == 'themes'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.map_layers_title}" /></h:outputLink></li>
+           </h:panelGroup>
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == 'coverages' or configManager.currentResourceManager.name == 'feature'
+            							or configManager.currentResourceManager.name == 'metadata' or configManager.currentResourceManager.name == 'tile'}">
+            <li><h:outputLink value="#"><h:outputText value="#{labels.data_stores_title}" /></h:outputLink></li>
+           </h:panelGroup> 
+           <h:panelGroup rendered="#{configManager.currentResourceManager.name == null}">
+           	<li><h:outputLink value="#"><h:outputText value="#{labels.general_title}" /></h:outputLink></li>
+           </h:panelGroup>
+            <li class="active">
+            	<h:panelGroup rendered="#{configManager.currentResourceManager.name != null}">
+            		<h:outputText value="#{configManager.currentResourceManager.name}" />
+            	</h:panelGroup>
+            	<h:panelGroup rendered="#{configManager.currentResourceManager.name == null}">
+		         <h:panelGroup rendered="#{editConfig.location.name == 'proxy.xml'}">
+		         	<h:outputText value="#{labels.link_proxy}" />
+		         </h:panelGroup>
+		       </h:panelGroup>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+              <!-- 내용 시작 -->
+
+				<h:panelGroup rendered="#{editConfig == null}">
+					<h:panelGroup styleClass="welcomeText">
+						<br /><br />
+						<div style="width:100%;height:300px;text-align:center;">
+							<h:outputText value="#{labels.please_use_left_links}" />
+						</div>
+					</h:panelGroup>	
+				</h:panelGroup>
+				<h:panelGroup rendered="#{editConfig != null}">
+					<br />
+					<div>
+						<h:outputText value="#{labels.label_editing}" /><br /> #{editConfig.location}
+						<h:panelGroup rendered="#{editConfig.schemaURL != null}">
+							<fieldset class="fieldset">
+								<legend>
+									<h:outputText styleClass="titel"
+										value="#{editConfig.location.name}" />
+								</legend>
+								<h:form id="xmlForm">
+									<table style="width:230px;margin-bottom:10px;">
+										<tr>
+											<td>
+												<h:link styleClass="btn btn-default"
+													value="#{labels.xmlEditor_schema}" outcome="schema" target="_blank" />
+											</td>
+											<td>
+												<h:panelGroup rendered="#{configManager.currentResourceManager.name != null}">
+													<h:outputLink styleClass="btn btn-default"
+														value="../../#{configManager.currentResourceManager.startView}.jsf">
+														<h:outputText value="#{labels.xmlEditor_cancel}" />
+													</h:outputLink>
+												</h:panelGroup>	
+												<h:panelGroup rendered="#{configManager.currentResourceManager.name == null}">
+													<h:panelGroup rendered="#{editConfig.location.name == 'proxy.xml'}">
+											         	<h:outputLink styleClass="btn btn-default" value="../jsf/proxy.jsf">
+															<h:outputText value="#{labels.xmlEditor_cancel}" />
+														</h:outputLink>
+											         </h:panelGroup>
+												</h:panelGroup>
+											</td>
+											<td>&nbsp;</td>
+											<td>
+												<h:panelGroup rendered="#{configManager.currentResourceManager.name == 'feature'}">
+													<h:commandButton styleClass="btn btn-primary" value="#{labels.xmlEditor_save}" onclick="save()" action="${spConfigManager.saveFeture}">
+														<f:setPropertyActionListener target="#{actionParams.param1}" value="#{configManager}" />
+														<f:setPropertyActionListener target="#{actionParams.param2}" value="#{editConfig}" />
+													</h:commandButton>
+												</h:panelGroup>
+												<h:panelGroup rendered="#{configManager.currentResourceManager.name != 'feature'}">
+													<h:commandButton styleClass="btn btn-primary" value="#{labels.xmlEditor_save}" onclick="save()" action="${editConfig.save}" />
+												</h:panelGroup>	
+												
+												
+											</td>
+										</tr>
+									</table>	
+									<div style="border: 1px solid gray;">
+										<dg:inputConfigurationXML styleClass="textarea" style="height:300px;" id="inputXML"
+											value="${editConfig.content}"
+											schemaURLS="${editConfig.schemaURL}" />
+									</div>
+								</h:form>
+								<br/>
+								<p id="highlighting" style="cursor: pointer;" class="badge bg-yellow"
+									onclick="activateEditor();"><h:outputText value="#{labels.turn_on_highlighting}" /></p>
+							</fieldset>
+						</h:panelGroup>
+					</div>
+				</h:panelGroup>
+		
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+
+        </div><!-- /.content -->
+        	
+		
+		</fieldset>
+		
+	</h:panelGroup>
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

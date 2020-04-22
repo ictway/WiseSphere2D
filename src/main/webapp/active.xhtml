@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<ui:composition>
+	        <h:panelGroup id="header" layout="block">
+				<h:panelGroup id="logo">
+					<h:panelGroup styleClass="submenu" layout="block"
+						rendered="#{logBean.loggedIn}">
+						<h:form>
+							<h:outputText styleClass="menutopic" value="#{labels.active_workspace}" />
+							<h:outputText value="#{workspace.activeWorkspace.name}" />
+
+							<h:commandButton value="#{labels.apply_changes}"
+								styleClass="btn btn-primary" style="margin-left:10px;" action="#{workspace.applyChanges}"
+								onclick="show();" rendered="#{!workspace.pendingChanges}" />
+							<h:commandButton value="#{labels.apply_changes}"
+								styleClass="btn btn-warning" style="margin-left:10px;" action="#{workspace.applyChanges}"
+								onclick="show();" rendered="#{workspace.pendingChanges}" />
+						</h:form>
+					</h:panelGroup>
+				</h:panelGroup>
+				<h:panelGroup id="login">
+				</h:panelGroup>
+			</h:panelGroup>
+</ui:composition>
+</html>

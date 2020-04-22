@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	version="2.4">
+	<display-name>Wise Sphere 1 OGC services console + generic client</display-name>
+
+	<context-param>
+		<param-name>javax.faces.PROJECT_STAGE</param-name>
+		<param-value>Development</param-value>
+	</context-param>
+	
+	<context-param>
+   		<param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
+   		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+	    <param-name>com.sun.faces.numberOfViewsInSession</param-name>
+	    <param-value>500</param-value>
+	</context-param>
+	<context-param>
+	    <param-name>com.sun.faces.numberOfLogicalViews</param-name>
+	    <param-value>500</param-value>
+	</context-param>
+	<context-param>
+        <param-name>org.ajax4jsf.handleViewExpiredOnClient</param-name> 
+        <param-value>true</param-value>     
+    </context-param>
+<!-- 
+	<filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
+	</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+ -->
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.jsf</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.xhtml</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>services</servlet-name>
+		<servlet-class>org.deegree.services.controller.OGCFrontController</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>resources</servlet-name>
+		<servlet-class>org.deegree.services.resources.ResourcesServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>config</servlet-name>
+		<servlet-class>org.deegree.services.config.servlet.ConfigServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	
+	<!-- Geocoding Service 2016.06 
+	<servlet>
+		<servlet-name>geocode</servlet-name>
+		<servlet-class>com.ictway.wisesphere.geocode.GeocodingServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	-->
+	
+	<!-- CustomResource Service 2016.11-->   
+	<servlet>
+		<servlet-name>customResource</servlet-name>
+		<servlet-class>com.ictway.wisesphere.services.custom.ResourceServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	
+	
+	<servlet-mapping>
+		<servlet-name>services</servlet-name>
+		<url-pattern>/services</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>services</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>resources</servlet-name>
+		<url-pattern>/resources/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>config</servlet-name>
+		<url-pattern>/config/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- VTS Service  
+	<servlet-mapping>
+		<servlet-name>vts</servlet-name>
+		<url-pattern>/services/vts/*</url-pattern>
+	</servlet-mapping>
+	-->
+	
+	
+	<!-- Geocoding Service 
+	<servlet-mapping>
+		<servlet-name>geocode</servlet-name>
+		<url-pattern>/services/geocode/*</url-pattern>
+	</servlet-mapping>
+	-->
+	
+	<!-- Geocoding Service--> 
+	<servlet-mapping>
+		<servlet-name>customResource</servlet-name>
+		<url-pattern>/services/customResource/*</url-pattern>
+	</servlet-mapping>
+	
+	
+
+	<welcome-file-list>
+		<welcome-file>console.xhtml</welcome-file>
+		<!-- <welcome-file>index.xhtml</welcome-file> <welcome-file>index.jsf</welcome-file> 
+			<welcome-file>index.jsp</welcome-file> <welcome-file>index.html</welcome-file> 
+			<welcome-file>index.htm</welcome-file> -->
+	</welcome-file-list>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Configuration</web-resource-name>
+			<url-pattern>/config/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>deegree</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>deegree web configuration API</realm-name>
+	</login-config>
+
+	<security-role>
+		<description>deegree administrator role</description>
+		<role-name>deegree</role-name>
+	</security-role>
+
+
+	<!-- http basic auth enable -->
+	<!-- Define a security constraint on this application -->
+	<!-- User and role must be added to tomcat-users.xml -->
+	<!-- <security-constraint> <web-resource-collection> <web-resource-name>Entire 
+		Application</web-resource-name> <url-pattern>/*</url-pattern> </web-resource-collection> 
+		<auth-constraint> <role-name>demoadmin</role-name> </auth-constraint> </security-constraint> 
+		<login-config> <auth-method>BASIC</auth-method> <realm-name>Tomcat Manager 
+		Application</realm-name> </login-config> <security-role> <description>The 
+		role that is required to log in to the Manager Application</description> 
+		<role-name>demoadmin</role-name> </security-role> -->
+	<!-- end -->
+
+	<!-- error-page> <exception-type>java.lang.Exception</exception-type> <location>/error.xhtml</location> 
+		</error-page -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/viewer/error_404.html</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/viewer/error.html</location>
+	</error-page>
+</web-app>

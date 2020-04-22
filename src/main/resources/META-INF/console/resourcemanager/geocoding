@@ -1,0 +1,10 @@
+ES_HOSTNAME=192.168.0.24
+ES_PORT=9300
+ES_CLUSTERNAME=app.search.ictway
+ES_GEOCODE_INDEXNAME=address
+ES_GEOCODE_TYPENAME=FeatureCollection
+ES_GEOCODE_FEILD=properties.new_addr
+ES_GEOCODE_NGRAM_FEILD=properties.new_addr_ng
+ES_BLDNUM_FEILD=properties.bld_num
+ES_KOREA_ANALYZER=korean_analyzer
+ES_NGRAM_ANALYZER=ngram_analyzer

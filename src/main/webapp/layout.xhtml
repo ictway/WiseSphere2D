@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:head>
+    <title><h:outputText value="#{labels.spatium_manage}" /></title>
+	<h:outputStylesheet name="css/styles.css" />
+	<h:outputStylesheet name="css/bootstrap.min.css" />
+	<h:outputStylesheet name="dist/css/font-awesome.min.css" />
+	<h:outputStylesheet name="dist/css/AdminLTE.min.css" />
+	<h:outputStylesheet name="dist/css/skins/_all-skins.min.css" />
+	<ui:insert name="additionCssInHeader" />
+	<h:outputScript name="console.js" />
+	<h:outputScript name="js/jQuery-2.1.3.min.js" />
+	<h:outputScript name="js/bootstrap.min.js" />
+	<h:outputScript name="js/jquery.slimscroll.min.js" />
+	<h:outputScript name="dist/js/app.js" />
+</h:head>
+<h:body class="skin-blue fixed">
+	<div id="PLEASEWAIT">
+		<div class="curved">
+			<b class="b1"></b><b class="b2"></b><b class="b3"></b><b class="b4"></b>
+			<div class="boxcontent">
+				<p>
+					<h:outputText value="#{labels.applying_changes}" /><br/>
+					<h:outputText value="#{labels.please_wait}" />
+				</p>
+			</div>
+			<b class="b4"></b><b class="b3"></b><b class="b2"></b><b class="b1"></b>
+		</div>
+	</div>
+	<div id="PLEASEWAIT_BG"></div>
+
+	<h:panelGroup id="container" layout="block">
+    <!-- Site wrapper -->
+    <div class="wrapper">
+      
+      <div class="main-header">
+        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/" class="logo"><b>Wise Sphere</b> 관리</h:outputLink>
+        <!-- Header Navbar: style can be found in header.less -->
+        <div class="navbar navbar-static-top" role="navigation">
+          <!-- Sidebar toggle button-->
+          <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+            	<!-- 도움말 추가...BY_JIN -->
+				<li>
+                	<!-- <a href="javascript:window.open('http://14.35.204.242:8080/ws/viewer/dist/doc/ws.pdf', '_blank');" data-toggle="control-sidebar"><i class="fa fa-file-pdf-o"></i> 도움말</a> -->
+                	<a href="/ws/viewer/dist/doc/ws.pdf" target="_blank" data-toggle="control-sidebar"><i class="fa fa-file-pdf-o"></i> 도움말</a>
+              	</li>
+              	<!-- 도움말 추가...BY_JIN -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================================== -->
+
+      <!-- Left side column. contains the sidebar -->
+      <div class="main-sidebar">
+        <!-- sidebar: style can be found in sidebar.less -->
+        <div class="sidebar">
+          <!-- Sidebar user panel -->
+          <div class="user-panel">
+            <div class="pull-left info">
+            	<ui:include src="/console/security/login.xhtml" />
+            </div>
+          </div>
+          <!-- sidebar menu: : style can be found in sidebar.less -->
+          <ul class="sidebar-menu">
+				<ui:include src="menu.xhtml" />
+          </ul>
+        </div>
+        <!-- /.sidebar -->
+      </div>
+
+      <!-- =============================================== -->
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <h:panelGroup id="main" styleClass="main" layout="block">
+				<ui:insert name="center" />
+				<h:panelGroup>
+					<h:messages errorClass="consoleError" style="color:red;padding-bottom:20px;" />
+				</h:panelGroup>
+		</h:panelGroup>
+      </div><!-- /.content-wrapper -->
+
+      <div class="main-footer">
+        <div class="pull-right hidden-xs">
+          <b><h:outputText value="#{labels.footer}" /></b> v1.0
+        </div>
+        <strong>Copyright &copy; 2015 <h:outputLink value="http://www.ictway.co.kr">ICTWAY</h:outputLink>.</strong> All rights reserved.
+      </div>
+    </div><!-- ./wrapper -->
+	</h:panelGroup>
+</h:body>
+</html>

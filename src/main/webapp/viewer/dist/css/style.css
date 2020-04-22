@@ -1,0 +1,47 @@
+.stage * {
+	-moz-transition:-moz-transform 0.75s;
+	-moz-transform-style:preserve-3d;
+	-webkit-transition:-webkit-transform 0.75s;
+	-webkit-transform-style:flat;
+}
+
+.bottomaxis {
+	-webkit-transform-origin:bottom center;
+	-moz-transform-origin:bottom center;
+}
+.tiltmap {
+	-webkit-transform:rotateX(60deg);
+	-moz-transform:rotateX(60deg);
+
+}
+
+.perspective {
+	-webkit-perspective:1200;
+	-moz-perspective:1200px;
+}
+
+.flipmarkers {
+	-webkit-transform:rotateX(-90deg);
+	-moz-transform:rotateX(-90deg);
+}
+
+.tilter {
+}
+
+.rotating, .pivotmarker {
+	-moz-transition:-webkit-transform 1.5s;
+	-webkit-transition:-webkit-transform 1.5s;
+}
+
+.content {
+	padding: 0;
+	margin: 0;
+}
+
+.sidebar {
+	overflow: auto;
+}
+
+.ol-popover {
+	width: 200px;
+}

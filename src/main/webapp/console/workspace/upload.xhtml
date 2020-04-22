@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<h:body>
+	<ui:composition template="/layout.xhtml">
+		<ui:define name="center">
+
+        <h:panelGroup rendered="#{!logBean.loggedIn}">
+			<ui:include src="/console/jsf/accessForbidden.xhtml" />
+		</h:panelGroup>
+		<h:panelGroup rendered="#{logBean.loggedIn}">
+			
+<!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>
+            <h:outputText styleClass="welcomeText" value="#{labels.workspace_upload_title}" />
+            <!-- small>Blank example to the fixed layout</small -->
+          </h1>
+          <ol class="breadcrumb">
+            <li><h:outputLink value="#"><p class="fa fa-dashboard"></p> Home</h:outputLink></li>
+            <li><h:outputLink value="#"><h:outputText value="#{labels.general_title}" /></h:outputLink></li>
+            <li class="active"><h:outputText value="#{labels.link_workspace}" /></li>
+          </ol>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+          <!-- Default box -->
+          <div class="box">
+            <div class="box-body">
+              <!-- 내용 시작 -->
+
+				<h:panelGroup rendered="#{logBean.loggedIn}">
+					<h:panelGroup styleClass="welcomeText">
+						<br />
+						<p class="fa fa-circle-o text-info"></p>&nbsp;
+						<h:outputText styleClass="titel"  value="#{labels.workspace_upload}" />
+						<h:form>
+						<table class="table" style="width:460px;">
+							<tr>
+								<td colspan="3">
+									<h:outputText value="#{labels.Uploaded_workspace_file}" />
+									<h:outputText value="#{workspace.upload.fileName}" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h:outputText value="#{labels.import_as}" />
+								</td>
+								<td>
+									<h:inputText id="newName" value="#{workspace.workspaceImportName}" styleClass="form-control" style="width:300px;" required="true"
+				                    requiredMessage="#{labels.required_import_name}" maxlength="120" />
+				                </td>
+				                <td>    
+				                    <h:commandButton styleClass="btn btn-primary" value="#{labels.btn_ok}" action="#{workspace.unzipWorkspace}" />
+								</td>
+							</tr>
+			            </table>    
+		                </h:form>
+					</h:panelGroup>
+				</h:panelGroup>	
+						
+              <!-- 내용 종료 -->
+            </div><!-- /.box-body -->
+          </div><!-- /.box -->
+
+        </div><!-- /.content -->
+        	
+        </h:panelGroup>
+        
+	</ui:define>
+	</ui:composition>
+</h:body>
+</html>

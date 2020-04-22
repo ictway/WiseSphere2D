@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:dg="http://deegree.org/jsf"
+	xmlns:dgc="http://java.sun.com/jsf/composite/deegree">
+
+<ui:composition>
+	<li class="header"><h:outputText value="#{labels.spatium_manage}" /></li>
+	<c:set var="currentPage" value="${fn:substring(view.viewId, 0, fn:indexOf(view.viewId,'.'))}" />
+	<c:set var="general_view" value="treeview" />
+	<c:if test="${currentPage=='/console/client/client' or currentPage=='/console/workspace/workspace'
+				or currentPage=='/console/jsf/proxy' or currentPage=='/console/security/password' or currentPage=='/console/jsf/modules'
+				 or currentPage=='/console/client/client' or currentPage=='/console/wms/wms.html'}"><c:set var="general_view" value="active treeview" /></c:if>
+	<li class="${general_view}">
+              <a href="#">
+                <i class="fa fa-circle-o"></i>
+                <span><h:outputText value="#{labels.general_title}" /></span>
+              </a>
+              <ul class="treeview-menu">
+                <h:panelGroup rendered="#{logBean.loggedIn}" layout="block">
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/workspace/workspace.xhtml"><h:outputText value="#{labels.link_workspace}" /></h:outputLink>
+			    </li>
+			    <!-- 
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/jsf/proxy.xhtml"><h:outputText value="#{labels.link_proxy}" /></h:outputLink>
+			    </li>
+			     -->
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/security/password.xhtml"><h:outputText value="#{labels.link_password}" /></h:outputLink>
+			    </li>
+			    <!-- 
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/jsf/modules.xhtml"><h:outputText value="#{labels.link_moduleinfo}" /></h:outputLink>
+			    </li>
+			     -->
+			    </h:panelGroup>
+			            
+				<h:panelGroup layout="block">
+				<!-- 
+				<li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/client/client.xhtml"><h:outputText value="#{labels.link_genericClient}" /></h:outputLink>
+			    </li>
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/console/wms/wms.html"><h:outputText value="#{labels.link_wmsClient}" /></h:outputLink>
+			    </li>
+			     -->
+			    <li>
+			        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/viewer/index.html"><h:outputText value="#{labels.link_wmsClient}" /></h:outputLink>
+			    </li>
+				</h:panelGroup>
+              </ul>
+	</li>
+	
+	<h:panelGroup rendered="#{logBean.loggedIn}">
+	<h:form prependId="false">	
+		<c:set var="web_services_view" value="treeview" />
+		<c:if test="${currentPage!='/console/client/client' and currentPage!='/console/workspace/workspace'
+				 and currentPage!='/console/jsf/proxy' and currentPage!='/console/security/password' and currentPage!='/console/jsf/modules'
+				 and currentPage!='/console/client/client' and currentPage!='/console/wms/wms.html' 
+				 and configManager.currentResourceManager.name == 'services'}"><c:set var="web_services_view" value="active treeview" /></c:if>
+		<li class="${web_services_view}">
+			<a href="#">
+		               <i class="fa fa-circle-o"></i>
+		               <span><h:outputText value="#{labels.web_services_title}" /></span>
+		    </a>
+		    <ul class="treeview-menu">
+				<dgc:submenu items="#{configManager.webserviceManagers}"
+					displayname="web services" />
+			</ul>	
+		</li>
+		
+		<c:set var="data_stores_view" value="treeview" />
+		<c:if test="${currentPage!='/console/client/client' and currentPage!='/console/workspace/workspace'
+				 and currentPage!='/console/jsf/proxy' and currentPage!='/console/security/password' and currentPage!='/console/jsf/modules'
+				 and currentPage!='/console/client/client' and currentPage!='/console/wms/wms.html' 
+				 and (configManager.currentResourceManager.name == 'coverages' or configManager.currentResourceManager.name == 'feature'
+            			or configManager.currentResourceManager.name == 'metadata' or configManager.currentResourceManager.name == 'tile')}"><c:set var="data_stores_view" value="active treeview" /></c:if>
+		<li class="${data_stores_view}">	
+			<a href="#">
+		              <i class="fa fa-circle-o"></i>
+		              <span><h:outputText value="#{labels.data_stores_title}" /></span>
+		    </a>	
+		   <ul class="treeview-menu" id="datastoreManagers">     
+				<dgc:submenu items="#{configManager.datastoreManagers}" 
+					displayname="data stores" />
+			</ul>		
+		</li>
+		
+		<c:set var="map_layers_view" value="treeview" />
+		<c:if test="${currentPage!='/console/client/client' and currentPage!='/console/workspace/workspace'
+				 and currentPage!='/console/jsf/proxy' and currentPage!='/console/security/password' and currentPage!='/console/jsf/modules'
+				 and currentPage!='/console/client/client' and currentPage!='/console/wms/wms.html' 
+				 and (configManager.currentResourceManager.name == 'layers' or configManager.currentResourceManager.name == 'styles'
+            			or configManager.currentResourceManager.name == 'themes')}"><c:set var="map_layers_view" value="active treeview" /></c:if>
+		<li class="${map_layers_view}">
+		   <a href="#">
+		                <i class="fa fa-circle-o"></i>
+		                <span><h:outputText value="#{labels.map_layers_title}" /></span>
+		   </a>
+		   <ul class="treeview-menu">     		
+				<dgc:submenu items="#{configManager.mapManagers}" 
+					displayname="map layers" />
+			</ul>		
+		</li>
+		<c:set var="server_connection_view" value="treeview" />
+		<c:if test="${currentPage!='/console/client/client' and currentPage!='/console/workspace/workspace'
+				 and currentPage!='/console/jsf/proxy' and currentPage!='/console/security/password' and currentPage!='/console/jsf/modules'
+				 and currentPage!='/console/client/client' and currentPage!='/console/wms/wms.html' 
+				 and (configManager.currentResourceManager.name == 'jdbc' or configManager.currentResourceManager.name == 'remote ows')}"><c:set var="server_connection_view" value="active treeview" /></c:if>
+		<li class="${server_connection_view}">
+			<a href="#">
+		                <i class="fa fa-circle-o"></i>
+		                <span><h:outputText value="#{labels.server_connection_title}" /></span>
+		    </a>		
+			<ul class="treeview-menu" id="connectionManagers">
+				<dgc:submenu items="#{configManager.connectionManagers}"
+					displayname="server connections" />
+			</ul>		
+		</li>
+		
+		<!-- 
+		<c:set var="processes_view" value="treeview" />
+		<c:if test="${currentPage!='/console/client/client' and currentPage!='/console/workspace/workspace'
+				 and currentPage!='/console/jsf/proxy' and currentPage!='/console/security/password' and currentPage!='/console/jsf/modules'
+				 and currentPage!='/console/client/client' and currentPage!='/console/wms/wms.html' 
+				 and configManager.currentResourceManager.name == 'provider'}"><c:set var="processes_view" value="active treeview" /></c:if>
+		<li class="${processes_view}">
+			<a href="#">
+		                <i class="fa fa-circle-o"></i>
+		                <span><h:outputText value="#{labels.processes_title}" /></span>
+		    </a>	
+			<ul class="treeview-menu">
+				<dgc:submenu items="#{configManager.processManagers}"
+					displayname="processes" />
+			</ul>		
+		</li>
+		 -->		
+	</h:form>		
+
+		<h:panelGroup rendered="#{!spConfigManager.tileHasError}">
+		<script>
+			try{
+				// 기존 소스 주석 처리...BY_JIN
+// 				var dd = document.getElementById('datastoreManagers');
+// 				if(dd.firstChild.lastChild.firstChild.firstChild.textContent == 'tile'
+// 					&amp;&amp; dd.firstChild.lastChild.lastChild.lastChild.textContent != 'tile'){
+// 						dd.firstChild.lastChild.removeChild(dd.firstChild.lastChild.lastChild);
+// 				}
+			} catch(e){
+// 				alert(e);
+			}
+		</script>	
+		</h:panelGroup>
+		<script>
+			// 모든 경우에 remove...BY_JIN
+			try{
+
+				if (!('remove' in Element.prototype)) {
+				    Element.prototype.remove = function() {
+				        this.parentNode.removeChild(this);
+				    };
+				} 
+				
+				//2016.02.12 
+				//tile, remoteWMS 메뉴 다시 추가 By jmkim
+				
+				// tile menu remove...BY_JIN
+				var dm = document.getElementById('datastoreManagers');
+				if(dm.firstChild.lastChild.firstChild.firstChild.textContent == 'tile') {
+					dm.firstChild.lastChild.firstChild.parentElement.remove();
+				}
+
+				// remote ows menu remove...BY_JIN
+				var cm = document.getElementById('connectionManagers');
+				if(cm.firstChild.lastChild.firstChild.firstChild.textContent == 'remote ows') {
+					cm.firstChild.lastChild.firstChild.parentElement.remove();
+				}
+				
+				
+			} catch(e){
+				alert(e);
+			}
+
+
+			$(document).ready(function(e) {
+				$($("[id$=dbConn]")[0]).css("background","#ccc");
+			});
+			
+		</script>	
+		
+	</h:panelGroup>
+	
+</ui:composition>
+</html>

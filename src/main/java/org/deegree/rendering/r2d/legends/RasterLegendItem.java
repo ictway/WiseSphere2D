@@ -1,0 +1,119 @@
+//$HeadURL$
+/*----------------------------------------------------------------------------
+ This file is part of deegree, http://deegree.org/
+ Copyright (C) 2001-2010 by:
+ - Department of Geography, University of Bonn -
+ and
+ - lat/lon GmbH -
+
+ This library is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Lesser General Public License as published by the Free
+ Software Foundation; either version 2.1 of the License, or (at your option)
+ any later version.
+ This library is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ details.
+ You should have received a copy of the GNU Lesser General Public License
+ along with this library; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+ Contact information:
+
+ lat/lon GmbH
+ Aennchenstr. 19, 53177 Bonn
+ Germany
+ http://lat-lon.de/
+
+ Department of Geography, University of Bonn
+ Prof. Dr. Klaus Greve
+ Postfach 1147, 53001 Bonn
+ Germany
+ http://www.geographie.uni-bonn.de/deegree/
+
+ e-mail: info@deegree.org
+ ----------------------------------------------------------------------------*/
+package org.deegree.rendering.r2d.legends;
+
+import static java.awt.Font.PLAIN;
+import static java.lang.Math.max;
+
+import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.util.LinkedList;
+
+import org.deegree.rendering.r2d.RasterRenderer;
+import org.deegree.rendering.r2d.Renderer;
+import org.deegree.rendering.r2d.TextRenderer;
+import org.deegree.style.styling.RasterStyling;
+
+/**
+ * 
+ * @author <a href="mailto:schmitz@lat-lon.de">Andreas Schmitz</a>
+ * @author last edited by: $Author$
+ * 
+ * @version $Revision$, $Date$
+ */
+public class RasterLegendItem implements LegendItem {
+
+    private RasterStyling styling;
+
+    private LinkedList<String> texts = new LinkedList<String>();
+
+    private RasterLegendRenderer renderer;
+
+    public RasterLegendItem( RasterStyling styling, Renderer renderer, RasterRenderer rasterRenderer,
+                             TextRenderer textRenderer ) {
+        this.styling = styling;
+        if ( styling.interpolate != null ) {
+            for ( Double d : styling.interpolate.getDatas() ) {
+                texts.add( d.toString() );
+            }
+        }
+        if ( styling.categorize != null ) {
+            Float[] values = styling.categorize.getThreshholds();
+            boolean prec = styling.categorize.getPrecedingBelongs();
+            texts.add( ( prec ? "< " : "<= " ) + values[0] );
+            for ( int i = 0; i < values.length - 1; ++i ) {
+                texts.add( values[i] + ( prec ? " < " : " <= " ) + values[i + 1] );
+            }
+            texts.add( ( prec ? ">= " : "> " ) + values[values.length - 1] );
+        }
+        this.renderer = new RasterLegendRenderer( styling, renderer, rasterRenderer, textRenderer, texts );
+    }
+
+    @Override
+    public int getHeight() {
+        if ( styling.interpolate != null ) {
+            return styling.interpolate.getDatas().length;
+        }
+        if ( styling.categorize != null ) {
+            return styling.categorize.getThreshholds().length + 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public int getMaxWidth( LegendOptions opts ) {
+        int res = 2 * opts.spacing + opts.baseWidth;
+
+        Font font = new Font( "Arial", PLAIN, opts.textSize );
+
+        for ( String text : texts ) {
+            if ( text != null && text.length() > 0 ) {
+                TextLayout layout = new TextLayout( text, font, new FontRenderContext( new AffineTransform(), true,
+                                                                                       false ) );
+                res = (int) max( layout.getBounds().getWidth() + ( 2 * opts.baseWidth ), res );
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public void paint( int origin, LegendOptions opts ) {
+        renderer.paint( origin, opts );
+    }
+
+}

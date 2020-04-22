@@ -1,0 +1,2 @@
+com.ictway.wisesphere.commons.jdbc.driver.AltibaseDriverManager
+com.ictway.wisesphere.commons.jdbc.driver.TiberoDriverManager
