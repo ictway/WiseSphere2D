@@ -1,154 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+	<classpathentry exported="true" kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jts-core-1.14.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jts-io-1.14.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/Altibase.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/Altibase6_3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/antlr-2.7.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/antlr-runtime-3.4.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/apache-mime4j-core-0.7.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/asm-3.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/axiom-api-1.2.14.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/axiom-impl-1.2.14.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-anim-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-awt-util-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-bridge-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-codec-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-css-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-dom-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-ext-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-gvt-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-parser-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-script-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-svg-dom-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-transcoder-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-util-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/batik-xml-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-cli-1.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-codec-1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-dbcp-1.4.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-fileupload-1.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-math-2.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/commons-pool-1.6.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-annotations-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-base-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-coverage-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-cs-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-featureinfo-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-filterfunctions-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-geometry-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-layer-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-metadata-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-rendering-2d-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-style-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-theme-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-tile-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-memory-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-shape-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-simplesql-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-sql-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-javacheck-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-jsf-console-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-jsf-core-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-coverage-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-feature-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-remotewms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-tile-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-iso-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-iso-memory-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-ogcschemas-20120804.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wfs-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wmts-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-wms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-wmts-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-config-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-csw-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wfs-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wmts-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wps-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-sqldialect-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-sqldialect-postgis-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-themes-remotewms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-cache-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-commons-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-filesystem-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-geotiff-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-remotewms-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-remotewmts-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tomcat-3.3.18.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/ehcache-core-2.6.5.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/FastInfoset-1.2.12.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-activation_1.1_spec-1.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-javamail_1.4_spec-1.7.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/gson-2.2.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/guava-20.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/h2-1.3.171.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/httpclient-4.2.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/httpcore-4.2.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/imageio-ext-tiff-1.1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/imageio-ext-utilities-1.1.7.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-annotations-2.6.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-core-2.6.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-databind-2.6.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jai-codec-1.1.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jai-core-1.1.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jai-imageio-1.1.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jai-mlibwrapper-1.1.3.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/javassist-3.12.1.GA.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jaxen-1.1.4.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jcl-over-slf4j-1.7.5.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jdbc.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jgridshift-1.0-deegreeversion.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jogl-1.1.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jsf-api-2.1.19.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jsf-impl-2.1.19.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jsr173_api-1.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jsr305-1.3.9.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jstl-1.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/ojdbc6.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/postgis-jdbc-2.1.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/postgresql-9.4-1201.jdbc41.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/protobuf-javanano-3.1.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/reflections-0.9.8.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/serializer.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/slf4j-api-1.7.5.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/slf4j-log4j12-1.7.5.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/stax2-api-3.1.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/staxon-1.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/stringtemplate-3.2.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/tibero6-jdbc.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/vecmath-1.5.2.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/woodstox-core-asl-4.1.4.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/woodstox-core-lgpl-4.2.0.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/xalan-2.7.1.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/xml-apis-ext-1.3.04.jar"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/xml-apis.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/Altibase.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/Altibase6_3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/antlr-2.7.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/antlr-runtime-3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/apache-mime4j-core-0.7.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/asm-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/axiom-api-1.2.14.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/axiom-impl-1.2.14.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-anim-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-awt-util-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-bridge-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-codec-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-css-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-dom-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-ext-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-gvt-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-parser-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-script-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-svg-dom-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-transcoder-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-util-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/batik-xml-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-cli-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-codec-1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-fileupload-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-io-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-math-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/commons-pool-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-annotations-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-base-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-coverage-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-cs-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-featureinfo-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-filterfunctions-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-geometry-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-layer-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-metadata-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-rendering-2d-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-style-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-theme-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-core-tile-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-memory-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-shape-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-simplesql-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-featurestore-sql-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-javacheck-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-jsf-console-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-jsf-core-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-coverage-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-feature-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-remotewms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-layers-tile-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-iso-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-mdstore-iso-memory-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-ogcschemas-20120804.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wfs-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-protocol-wmts-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-wms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-remoteows-wmts-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-config-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-csw-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wfs-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wmts-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-services-wps-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-sqldialect-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-sqldialect-postgis-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-themes-remotewms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-cache-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-commons-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-filesystem-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-geotiff-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-remotewms-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tilestore-remotewmts-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/deegree-tomcat-3.3.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/ehcache-core-2.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/FastInfoset-1.2.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-activation_1.1_spec-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-javamail_1.4_spec-1.7.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/gson-2.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/guava-20.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/h2-1.3.171.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/httpclient-4.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/httpcore-4.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/imageio-ext-tiff-1.1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/imageio-ext-utilities-1.1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-annotations-2.6.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-core-2.6.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jackson-databind-2.6.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jai-codec-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jai-core-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jai-imageio-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jai-mlibwrapper-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/javassist-3.12.1.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jaxen-1.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jcl-over-slf4j-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jdbc.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jgridshift-1.0-deegreeversion.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jogl-1.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jsf-api-2.1.19.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jsf-impl-2.1.19.jar"/>
 	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jsp-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jsr173_api-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jsr305-1.3.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jts-core-1.14.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/jts-io-1.14.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/log4j-1.2.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/ojdbc6.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/postgis-jdbc-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/postgresql-9.4-1201.jdbc41.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/protobuf-javanano-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/reflections-0.9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/serializer.jar"/>
 	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/servlet-api.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/slf4j-log4j12-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/stax2-api-3.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/staxon-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/stringtemplate-3.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/tibero6-jdbc.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/vecmath-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/woodstox-core-asl-4.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/woodstox-core-lgpl-4.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/xalan-2.7.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/xercesImpl.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/xml-apis-ext-1.3.04.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/webapp/WEB-INF/lib/xml-apis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>

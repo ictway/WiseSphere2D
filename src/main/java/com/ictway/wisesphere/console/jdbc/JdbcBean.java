@@ -155,6 +155,7 @@ public class JdbcBean {
         if ( dbType.equals( "tibero" ) ) {
             dbPort = "8629";
             dbConn = "jdbc:tibero:thin:@" + dbHost + ":" + dbPort + ":" + dbName;
+            //dbConn = "jdbc:tibero:thin:@(description=(failover=on)(load_balance=on)(address_list=(address=(host=localhost)(port=8629))(address=(host=localhost)(port=8629)))(DATABASE_NAME=tibero))";
             return;
         }
     }
@@ -298,11 +299,51 @@ public class JdbcBean {
             return;
         }
         if ( dbType.equals( "tibero" ) ) {
+        	/*
         	if ( dbPort == null || dbPort.isEmpty() ) {
         		dbPort = "8629";
         	}
             dbConn = "jdbc:tibero:thin:@" + dbHost + ":" + dbPort + ":" + dbName;
             return;
+            */
+        	if ( dbPort == null || dbPort.isEmpty() ) {
+                dbPort = "8629";
+            }
+
+            List<String> hostList = null;
+            List<String> portList = null;
+            
+            int hostCount = dbHost.split(",").length;
+            int portCount = dbPort.split(",").length;
+            
+        	String haConn = "";
+
+            if ((hostCount > 1)&&(portCount > 1)&&(hostCount == portCount)&&(haConn.length()<1)) {
+            	hostList = Arrays.asList(dbHost.split(","));
+            	portList = Arrays.asList(dbPort.split(","));
+
+                for (int i=0; i<hostList.size(); i++) {
+                	String strHost = hostList.get(i);
+                	String strPort = portList.get(i);
+
+                	if (strHost.contains(":"))
+                		strHost = strHost.substring(0, strHost.indexOf(":"));
+
+                	if (strPort.contains(":"))
+                		strPort = strPort.substring(strPort.indexOf(":")+1, strPort.length());
+                	
+                	haConn += (strHost + ":" + strPort + ",");
+                }
+                haConn = haConn.substring(0, haConn.length()-1);
+
+                dbConn = "jdbc:tibero:thin:@" + haConn + ":" + dbName;
+            } else {
+            	dbConn = "jdbc:tibero:thin:@" + dbHost + ":" + dbPort + ":" + dbName;	
+            }
+            
+            //dbConn = "jdbc:tibero:thin:@(description=(failover=on)(load_balance=on)(address_list=(address=(host=localhost)(port=8629))(address=(host=localhost)(port=8629)))(DATABASE_NAME=tibero))";
+
+            return;        	
         }
     }
 

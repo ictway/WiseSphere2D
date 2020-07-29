@@ -352,7 +352,7 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 				stmt.setString(1, bboxString);
 //				 LOG.debug( "Statement to fetch features was '{}'.", connType == Type.Oracle ? sql : stmt );
 //				LOG.info( "[Before] >>>>>>> Wise Sphere  Query Log....==> sql : '{}'. bbox : '{}'", sql, bboxString);
-				stmt.setQueryTimeout(30);
+				//stmt.setQueryTimeout(30);
 				stmt.execute();
 //LOG.info(">>>>>> query executed --- ");				
 				// LOG.debug( " Statement to fetch features was '{}'.", connType

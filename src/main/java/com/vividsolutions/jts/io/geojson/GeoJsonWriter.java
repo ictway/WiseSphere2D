@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.deegree.cs.CoordinateTransformer;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
@@ -272,7 +273,6 @@ public class GeoJsonWriter {
 
   private String getJsonString(CoordinateSequence coordinateSequence) {
     StringBuffer result = new StringBuffer();
-
     if (coordinateSequence.size() > 1) {
       result.append("[");
     }
@@ -285,6 +285,7 @@ public class GeoJsonWriter {
       result.append(",");
       result.append(formatOrdinate(coordinateSequence.getOrdinate(i, CoordinateSequence.Y)));
 
+      /*
       if (coordinateSequence.getDimension() > 2 ) {
         double z = coordinateSequence.getOrdinate(i, CoordinateSequence.Z);
         if (!  Double.isNaN(z)) {
@@ -292,6 +293,7 @@ public class GeoJsonWriter {
           result.append(formatOrdinate(z));
         }
       }
+      */
 
       result.append("]");
 

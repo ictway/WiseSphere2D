@@ -81,6 +81,7 @@ import org.deegree.commons.tom.gml.property.Property;
 import org.deegree.commons.tom.ows.Version;
 import org.deegree.commons.tom.primitive.PrimitiveValue;
 import org.deegree.commons.utils.kvp.InvalidParameterValueException;
+import org.deegree.cs.CRSCodeType;
 import org.deegree.cs.exceptions.TransformationException;
 import org.deegree.cs.exceptions.UnknownCRSException;
 import org.deegree.feature.Feature;
@@ -103,6 +104,7 @@ import org.deegree.geometry.Envelope;
 import org.deegree.geometry.standard.multi.DefaultMultiLineString;
 import org.deegree.geometry.standard.multi.DefaultMultiPoint;
 import org.deegree.geometry.standard.multi.DefaultMultiPolygon;
+import org.deegree.geometry.standard.primitive.DefaultLineString;
 import org.deegree.geometry.standard.primitive.DefaultPoint;
 import org.deegree.geometry.standard.primitive.DefaultPolygon;
 import org.deegree.gml.GMLStreamWriter;
@@ -119,14 +121,22 @@ import org.deegree.services.wfs.WfsFeatureStoreManager;
 import org.deegree.services.wfs.format.gml.BufferableXMLStreamWriter;
 import org.deegree.services.wfs.format.gml.GmlFormat;
 import org.deegree.services.wfs.query.QueryAnalyzer;
+import org.locationtech.proj4j.BasicCoordinateTransform;
+import org.locationtech.proj4j.CRSFactory;
+import org.locationtech.proj4j.CoordinateReferenceSystem;
+import org.locationtech.proj4j.ProjCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.geojson.GeoJsonWriter;
 
 import no.ecc.vectortile.VectorTileEncoder;
-
 
 /**
  * Handles {@link GetFeature} and {@link GetFeatureWithLock} requests for the
@@ -141,7 +151,9 @@ import no.ecc.vectortile.VectorTileEncoder;
 public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GmlGetFeatureHandler.class);
-
+	
+	private static CRSFactory factory = new CRSFactory();
+	
 	/**
 	 * Creates a new {@link GmlGetFeatureHandler} instance.
 	 * 
@@ -151,7 +163,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 	public GmlGetFeatureHandler(GmlFormat format) {
 		super(format);
 	}
-
+	
 	/**
 	 * Performs the given {@link GetFeature} request.
 	 * 
@@ -180,7 +192,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 		int traverseXLinkDepth = 0;
 		BigInteger resolveTimeout = null;
 		String xLinkTemplate = getObjectXlinkTemplate(request.getVersion(), gmlVersion);
-
+		
 		if (VERSION_110.equals(request.getVersion()) || VERSION_200.equals(request.getVersion())) {
 			if (request.getResolveParams().getDepth() != null) {
 				if ("*".equals(request.getResolveParams().getDepth())) {
@@ -542,11 +554,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			Coordinate p1;
 			Coordinate p2;
 			if (env == null) {
-				// 'POLYGON ((13868378.000000 3916910.000000,14577581.000000
-				// 3916910.000000,14577581.000000 4669832.000000,13868378.000000
-				// 4669832.000000,13868378.000000 3916910.000000))'
-				p1 = new Coordinate(13868378.000000, 3916910.000000);
-				p2 = new Coordinate(14577581.000000, 4669832.000000);
+				p1 = new Coordinate(0.000000, 0.000000);
+				p2 = new Coordinate(24577581.000000, 5669832.000000);
 			} else {
 				p1 = new Coordinate(env.getMin().get0(), env.getMin().get1());
 				p2 = new Coordinate(env.getMax().get0(), env.getMax().get1());
@@ -555,7 +564,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			com.vividsolutions.jts.geom.Envelope jenv = new com.vividsolutions.jts.geom.Envelope(p1, p2);
 			com.vividsolutions.jts.geom.GeometryFactory gf = new com.vividsolutions.jts.geom.GeometryFactory();
 			com.vividsolutions.jts.geom.Geometry eg = gf.toGeometry(jenv);
-
+			
 			vte.setClipGeometry(eg);
 
 			// @@ ksjang Test
@@ -584,25 +593,76 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						if (property.get(j) instanceof GenericProperty) {
 							GenericProperty p = (GenericProperty) property.get(j);
 							TypedObjectNode ton = p.getValue();
+							
 							if (ton instanceof DefaultMultiPoint) {
 								DefaultMultiPoint dmp = (DefaultMultiPoint) ton;
+								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
+								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Coordinate[] coords = geom.getCoordinates();
+									for (int m=0; m<coords.length; m++) {
+										meters2degree(coords[m]);
+									}
+									
+									GeometryFactory fact = new GeometryFactory();
+									geom = fact.createMultiPoint(coords);
+								}
 							}
 							else if (ton instanceof DefaultPoint) {
 								DefaultPoint dmp = (DefaultPoint) ton;
+								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
+								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Coordinate coord = geom.getCoordinate();
+									
+									GeometryFactory fact = new GeometryFactory();
+									geom = fact.createPoint(coord);
+								}
 							}
 							else if (ton instanceof DefaultMultiLineString) {
 								DefaultMultiLineString dmp = (DefaultMultiLineString) ton;
+								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-							}
-							else if (ton instanceof DefaultMultiPolygon) {
-								DefaultMultiPolygon dmp = (DefaultMultiPolygon) ton;
-								geom = dmp.getJTSGeometry();
+								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Coordinate[] coords = geom.getCoordinates();
+									for (int m=0; m<coords.length; m++) {
+										meters2degree(coords[m]);
+									}
+									
+									GeometryFactory fact = new GeometryFactory();
+									geom = fact.createLineString(coords);
+								}
 							}
 							else if (ton instanceof DefaultPolygon) {
 								DefaultPolygon dmp = (DefaultPolygon) ton;
+								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
+								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Coordinate[] coords = geom.getCoordinates();
+									for (int m=0; m<coords.length; m++) {
+										meters2degree(coords[m]);
+									}
+									
+									GeometryFactory fact = new GeometryFactory();
+									geom = fact.createPolygon(coords);
+								}
+							}
+							else if (ton instanceof DefaultMultiPolygon) {
+								DefaultMultiPolygon dmp = (DefaultMultiPolygon) ton;
+								String srcAlias = dmp.getCoordinateSystem().getAlias();
+								geom = dmp.getJTSGeometry();
+								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Polygon[] polygons = new Polygon[geom.getNumGeometries()]; 
+									for (int m=0; m<geom.getNumGeometries(); m++) {
+										Coordinate[] coords = geom.getGeometryN(m).getCoordinates();
+										meters2degree(coords[m]);
+										GeometryFactory fact = new GeometryFactory();
+										polygons[m] = fact.createPolygon(coords);
+									}
+									
+									GeometryFactory fact = new GeometryFactory();
+									geom = fact.createMultiPolygon(polygons);
+								}
 							}
 
 						} else if (property.get(j) instanceof SimpleProperty) {
@@ -628,6 +688,15 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			e.printStackTrace();
 		}
 	}
+	
+	private  void meters2degree(Coordinate coord) {
+		double radius = 6378137.0;
+		double lon = (180 / Math.PI) * (coord.x / radius);
+		double lat = (360 / Math.PI) * (Math.atan(Math.exp(coord.y / radius)) - (Math.PI / 4));
+		coord.x = lon;
+		coord.y = lat;
+		coord.z = 0;
+	}
 
 	private void writeFeatureMembersStreamJson(Version wfsVersion, ServletOutputStream sos, QueryAnalyzer analyzer)
 			throws XMLStreamException, UnknownCRSException, TransformationException, FeatureStoreException,
@@ -640,9 +709,9 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 		int rowIdx = 0;
 		
 		String sCRS = analyzer.getRequestedCRS().getAlias();
-		if (sCRS.indexOf(":")>0) {
-			sCRS = sCRS.split(":")[1];
-		}
+		CoordinateReferenceSystem srcCrs = null;
+		CoordinateReferenceSystem dstCrs = factory.createFromName(sCRS);
+		
 		
 		for (Map.Entry<FeatureStore, List<Query>> fsToQueries : analyzer.getQueries().entrySet()) {
 			FeatureStore fs = fsToQueries.getKey();
@@ -665,8 +734,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			
 			bbox = p1.x + "," + p1.y + "," + p2.x + "," + p2.y;
 
-			String header = "{\"type\": \"FeatureCollection\",\"crs\": {\"type\": \"epsg\",\"properties\": {\"code\": \""+ sCRS+"\"}},\n" + 
-					"\"bbox\": [" + bbox + "],\n" +  
+			String header = "{\"type\": \"FeatureCollection\",\"crs\": {\"type\": \"name\",\"properties\": {\"name\": \"urn:ogc:def:crs::"+ sCRS+"\"}},\n" + 
+					//"\"bbox\": [" + bbox + "],\n" +  
 					"\"features\": [";
 
 			sos.write(header.getBytes());
@@ -674,7 +743,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			Iterator<Feature> itr = rs.iterator();
 			while (itr.hasNext()) {
 				Feature feature = itr.next();
-				
+
 				List<Property> property = feature.getProperties();
 				com.vividsolutions.jts.geom.Geometry geom = null;
 				
@@ -688,31 +757,219 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						
 						if (ton instanceof DefaultMultiPoint) {
 							DefaultMultiPoint dmp = (DefaultMultiPoint) ton;
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+
+							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
+							if (!srcCrs.equals(dstCrs)) {
+								int nLen = dmp.size();
+								Point[] polys = new Point[nLen];
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								
+								Coordinate[] coords = geom.getCoordinates();
+								Coordinate[] outCoords = new Coordinate[coords.length];
+								for (int i=0; i<coords.length; i++) {
+									ProjCoordinate dstProjCoord = new ProjCoordinate();
+
+									transformer.transform(
+											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
+											dstProjCoord);
+									outCoords[i] = new Coordinate();
+									outCoords[i].x = dstProjCoord.x;
+									outCoords[i].y = dstProjCoord.y;
+									outCoords[i].z = 0;
+
+									polys[i] = fact.createPoint(outCoords[i]);
+								}
+								
+
+								geom = fact.createMultiPoint(polys);
+							}
 						}
 						else if (ton instanceof DefaultPoint) {
 							DefaultPoint dmp = (DefaultPoint) ton;
+							
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+							
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+							
 							geom = dmp.getJTSGeometry();
+							
+							if (!srcCrs.equals(dstCrs)) { 
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								Coordinate coords = geom.getCoordinate();
+								ProjCoordinate dstProjCoord = new ProjCoordinate();
+								Coordinate outCoords = new Coordinate();
+								
+								transformer.transform(new ProjCoordinate(coords.x,coords.y,coords.z), 
+										dstProjCoord);
+								
+								outCoords = new Coordinate();
+								outCoords.x = dstProjCoord.x;
+								outCoords.y = dstProjCoord.y;
+								outCoords.z = 0;
+								
+								GeometryFactory fact = new GeometryFactory();
+								
+								geom = fact.createPoint(outCoords);
+							}
+						}
+						else if (ton instanceof DefaultLineString) {
+							DefaultLineString dmp = (DefaultLineString) ton;
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+							
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+							
+							geom = dmp.getJTSGeometry();
+							
+							if (!srcCrs.equals(dstCrs)) { 
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								Coordinate[] coords = geom.getCoordinates();
+								Coordinate[] outCoords = new Coordinate[coords.length];
+								for (int i=0; i<coords.length; i++) {
+									ProjCoordinate dstProjCoord = new ProjCoordinate();
+									transformer.transform(
+											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
+											dstProjCoord);
+									outCoords[i] = new Coordinate();
+									outCoords[i].x = dstProjCoord.x;
+									outCoords[i].y = dstProjCoord.y;
+									outCoords[i].z = 0;
+								}
+
+								GeometryFactory fact = new GeometryFactory();
+								
+								geom = fact.createLineString(outCoords);
+							}
 						}
 						else if (ton instanceof DefaultMultiLineString) {
 							DefaultMultiLineString dmp = (DefaultMultiLineString) ton;
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+
+							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
+							if (!srcCrs.equals(dstCrs)) {
+								int nLen = dmp.size();
+								LineString[] polys = new LineString[nLen];
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								
+								Coordinate[] coords = geom.getCoordinates();
+								Coordinate[] outCoords = new Coordinate[coords.length];
+								for (int i=0; i<coords.length; i++) {
+									ProjCoordinate dstProjCoord = new ProjCoordinate();
+									transformer.transform(
+											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
+											dstProjCoord);
+									outCoords[i] = new Coordinate();
+									outCoords[i].x = dstProjCoord.x;
+									outCoords[i].y = dstProjCoord.y;
+									outCoords[i].z = 0;
+
+								}
+								polys[0] = fact.createLineString(outCoords);
+
+								geom = fact.createMultiLineString(polys);
+							}
 						}
 						else if (ton instanceof DefaultPolygon) {
 							DefaultPolygon dmp = (DefaultPolygon) ton;
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+							
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+							
 							geom = dmp.getJTSGeometry();
+							
+							if (!srcCrs.equals(dstCrs)) { 
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								Coordinate[] coords = geom.getCoordinates();
+								Coordinate[] outCoords = new Coordinate[coords.length];
+								for (int i=0; i<coords.length; i++) {
+									ProjCoordinate dstProjCoord = new ProjCoordinate();
+									transformer.transform(
+											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
+											dstProjCoord);
+									outCoords[i] = new Coordinate();
+									outCoords[i].x = dstProjCoord.x;
+									outCoords[i].y = dstProjCoord.y;
+									outCoords[i].z = 0;
+								}
+
+								GeometryFactory fact = new GeometryFactory();
+								
+								geom = fact.createPolygon(outCoords);
+							}
 						}
 						else if (ton instanceof DefaultMultiPolygon) {
 							DefaultMultiPolygon dmp = (DefaultMultiPolygon) ton;
+							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
+
+							String srcAlias = (codec.length>1)?codec[1].getCode():((codec.length>0)?codec[0].getCode():"");
+							srcAlias = "EPSG:" + srcAlias;
+							
+							if (srcCrs == null) {
+								srcCrs = factory.createFromName(srcAlias);
+							}
+
+							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
+							if (!srcCrs.equals(dstCrs)) { 
+								int nLen = dmp.size();
+								Polygon[] polys = new Polygon[nLen];
+								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
+								
+								Coordinate[] coords = geom.getCoordinates();
+								Coordinate[] outCoords = new Coordinate[coords.length];
+								for (int i=0; i<coords.length; i++) {
+									ProjCoordinate dstProjCoord = new ProjCoordinate();
+									transformer.transform(
+											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
+											dstProjCoord);
+									outCoords[i] = new Coordinate();
+									outCoords[i].x = dstProjCoord.x;
+									outCoords[i].y = dstProjCoord.y;
+									outCoords[i].z = 0;
+
+								}
+								polys[0] = fact.createPolygon(outCoords);
+
+								geom = fact.createMultiPolygon(polys);
+							}
 						}
-						
 					} else if (property.get(j) instanceof SimpleProperty) {
 						SimpleProperty p = (SimpleProperty) property.get(j);
 						sName = p.getName().getLocalPart();
 						PrimitiveValue pv = p.getValue();
 						value = pv.getAsText();
-						//propString += ",\"" + sName + "\":\"" + value + "\""; 
+ 
 						propString.append(",\"");
 						propString.append(sName);
 						propString.append("\":\"");
@@ -720,14 +977,13 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						propString.append("\"");
 					}
 				}
-				//propString = propString.substring(1);
 				propString.deleteCharAt(0);
 
 				gw = new GeoJsonWriter();
+				
 				gw.setEncodeCRS(false);
 				geomString = gw.write(geom);
 				
-				//flist.append(",{\"type\": \"Feature\",\"id\": \""+idx+"\",\"geometry\":" + geomString + ", \"properties\":{"+ propString+"}}");
 				switch(rowIdx) {
 				case 0:
 					sos.write("{\"type\": \"Feature\",\"id\": \"".getBytes());
@@ -736,7 +992,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 					sos.write(",{\"type\": \"Feature\",\"id\": \"".getBytes());
 					break;
 				}
-				//sos.write(",{\"type\": \"Feature\",\"id\": \"".getBytes());
+
 				sos.write(Integer.toString(rowIdx).getBytes());
 				sos.write("\",\"geometry\":".getBytes());
 				sos.write(geomString.getBytes());
