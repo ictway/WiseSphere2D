@@ -129,11 +129,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import com.vividsolutions.jts.geom.util.GeometryTransformer;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.geojson.GeoJsonWriter;
 
 import no.ecc.vectortile.VectorTileEncoder;
@@ -153,6 +156,31 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(GmlGetFeatureHandler.class);
 	
 	private static CRSFactory factory = new CRSFactory();
+	
+	private static Geometry transProj(Geometry geometry, CoordinateReferenceSystem srcCrs,
+			CoordinateReferenceSystem dstCrs) {
+		BasicCoordinateTransform bt = new BasicCoordinateTransform(srcCrs, dstCrs);
+	    GeometryTransformer transformer = new GeometryTransformer() {
+	        @Override
+	        protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent) {
+	            Coordinate[] newCoords = new Coordinate[coords.size()];
+	            for (int i = 0; i < coords.size(); ++i) {
+	                Coordinate coord = coords.getCoordinate(i);
+	                
+	                ProjCoordinate dstProjCoord = new ProjCoordinate();
+					bt.transform(
+							new ProjCoordinate(coord.x,coord.y, 0),
+							dstProjCoord);
+
+					newCoords[i] = new Coordinate(dstProjCoord.x, dstProjCoord.y, 0);
+	            }
+	            return new CoordinateArraySequence(newCoords);
+	        }
+	    };
+	    Geometry result = transformer.transform(geometry);
+	    return result;
+	}	
+	
 	
 	/**
 	 * Creates a new {@link GmlGetFeatureHandler} instance.
@@ -749,6 +777,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 				
 				propString.delete(0, propString.length());
 				for (int j = 0; j < property.size(); j++) {
+					
 					String sName = "";
 					String value = "";
 					if (property.get(j) instanceof GenericProperty) {
@@ -769,6 +798,16 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
 							if (!srcCrs.equals(dstCrs)) {
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								/*
 								int nLen = dmp.size();
 								Point[] polys = new Point[nLen];
 								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
@@ -791,6 +830,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 								
 
 								geom = fact.createMultiPoint(polys);
+								*/
 							}
 						}
 						else if (ton instanceof DefaultPoint) {
@@ -873,6 +913,16 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
 							if (!srcCrs.equals(dstCrs)) {
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}								
+								/*
 								int nLen = dmp.size();
 								LineString[] polys = new LineString[nLen];
 								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
@@ -893,6 +943,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 								polys[0] = fact.createLineString(outCoords);
 
 								geom = fact.createMultiLineString(polys);
+								*/
 							}
 						}
 						else if (ton instanceof DefaultPolygon) {
@@ -942,7 +993,17 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
 							if (!srcCrs.equals(dstCrs)) { 
-								int nLen = dmp.size();
+								//int nLen = dmp.size();
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								/*
 								Polygon[] polys = new Polygon[nLen];
 								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
 								
@@ -962,6 +1023,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 								polys[0] = fact.createPolygon(outCoords);
 
 								geom = fact.createMultiPolygon(polys);
+								*/
 							}
 						}
 					} else if (property.get(j) instanceof SimpleProperty) {
@@ -977,7 +1039,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						propString.append("\"");
 					}
 				}
-				propString.deleteCharAt(0);
+				if (propString.length()>0)
+					propString.deleteCharAt(0);
 
 				gw = new GeoJsonWriter();
 				
