@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 
@@ -75,7 +76,7 @@ import org.slf4j.Logger;
  * 
  * @version $Revision$, $Date$
  */
-public class Config implements Comparable<Config> {
+public class Config implements Comparable<Config>, Serializable  {
 
 	private static final Logger LOG = getLogger(Config.class);
 

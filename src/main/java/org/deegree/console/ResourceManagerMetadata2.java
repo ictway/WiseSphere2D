@@ -39,6 +39,7 @@ import static org.deegree.commons.config.ResourceState.StateType.init_error;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @version $Revision$, $Date$
  */
-public class ResourceManagerMetadata2 implements Comparable<ResourceManagerMetadata2> {
+public class ResourceManagerMetadata2 implements Comparable<ResourceManagerMetadata2>, Serializable {
 
     private static Logger LOG = LoggerFactory.getLogger( ResourceManagerMetadata2.class );
 

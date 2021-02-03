@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.dbcp.DelegatingConnection;
@@ -121,13 +123,18 @@ public class ConnectionManager extends AbstractBasicResourceManager implements R
                 String connId = state.getId();
                 LOG.info( "Setting up JDBC connection pool for connection id '" + connId + "'..." + "" );
                 try {
-                    addPool( connId, state.getResource(), workspace );
-                    Connection conn = get( connId );
-                    if ( conn != null ) {
-                        conn.close();
-                    }
-                    idToState.put( connId, new ResourceState( connId, state.getConfigLocation(), this, init_ok, null,
-                                                              null ) );
+                	// if external connection pool
+                	if (!connId.contains(".CP")) {
+	                    addPool( connId, state.getResource(), workspace );
+	                    Connection conn = get( connId );
+	                    if ( conn != null ) {
+	                        conn.close();
+	                    }
+	                    idToState.put( connId, new ResourceState( connId, state.getConfigLocation(), this, init_ok, null,
+	                                                              null ) );
+                	} else {
+                		idToState.put( connId, new ResourceState( connId, state.getConfigLocation(), this, init_ok, null,null ) );
+                	}
                 } catch ( Throwable t ) {
                     ResourceInitException e = new ResourceInitException( t.getMessage(), t );
                     idToState.put( connId, new ResourceState( connId, state.getConfigLocation(), this, init_error,
@@ -168,18 +175,28 @@ public class ConnectionManager extends AbstractBasicResourceManager implements R
      * @return connection from the corresponding connection pool, null, if not available
      */
     public Connection get( String id ) {
-        ConnectionPool pool = idToPools.get( id );
-        if ( pool == null ) {
-            throw new RuntimeException( "Connection not configured." );
-        }
-        Connection conn = null;
+    	Connection conn = null;
+    	
         try {
-            conn = pool.getConnection();
-            return conn;
+        	if (id.contains(".CP")) {
+        		String cpName = id.substring(0, id.indexOf("."));
+    			InitialContext initCtx = new InitialContext();
+    			DataSource ds = (DataSource)initCtx.lookup(cpName);
+				conn = ds.getConnection();
+        	} else {
+	        	ConnectionPool pool = idToPools.get( id );
+	        	if ( pool == null ) {
+	        		throw new RuntimeException( "Connection not configured." );
+	        	}
+	            conn = pool.getConnection();
+        	}
         } catch ( SQLException e ) {
             LOG.warn( "JDBC connection {} is not available.", id );
             throw new RuntimeException( e.getLocalizedMessage(), e );
+        } finally {
+        	return conn;
         }
+        
     }
 
     /**
@@ -286,10 +303,14 @@ public class ConnectionManager extends AbstractBasicResourceManager implements R
             if ( idToPools.containsKey( connId ) ) {
                 throw new IllegalArgumentException( Messages.getMessage( "JDBC_DUPLICATE_ID", connId ) );
             }
-            // TODO check callers for read only flag
-            ConnectionPool pool = new ConnectionPool( connId, url, user, password, false, poolMinSize, poolMaxSize );
-            checkType( url, connId );
-            idToPools.put( connId, pool );
+            
+            // ictway external connection pool no add 
+            if (!connId.contains(".CP")) { 
+            	// TODO check callers for read only flag
+            	ConnectionPool pool = new ConnectionPool( connId, url, user, password, false, poolMinSize, poolMaxSize );
+            	checkType( url, connId );
+            	idToPools.put( connId, pool );
+            }
         }
     }
 

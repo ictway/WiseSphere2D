@@ -6,7 +6,11 @@ package com.ictway.wisesphere.services.custom;
 import static org.deegree.services.controller.OGCFrontController.getServiceWorkspace;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +41,7 @@ public class ResourceServlet extends HttpServlet {
 
 	private static final Logger LOG = getLogger(ResourceServlet.class);
 
-	private synchronized void updateResource(String rname)
+	private synchronized void updateResource(String layerId)
 			throws ResourceInitException, IOException, URISyntaxException {
 
 		DeegreeWorkspace dworkspace = getServiceWorkspace();
@@ -48,13 +52,13 @@ public class ResourceServlet extends HttpServlet {
 
 		File configFile = null;
 
-		configFile = new File(configRoot + File.separator + "styles" + File.separator + rname + ".xml");
+		configFile = new File(configRoot + File.separator + "styles" + File.separator + layerId + ".xml");
 		StyleStoreManager ssm = dworkspace.getSubsystemManager(StyleStoreManager.class);
-		ssm.manualActivate(rname, configFile);
+		ssm.manualActivate(layerId, configFile);
 
-		configFile = new File(configRoot + File.separator + "layers" + File.separator + rname + ".xml");
+		configFile = new File(configRoot + File.separator + "layers" + File.separator + layerId + ".xml");
 		LayerStoreManager lsm = dworkspace.getSubsystemManager(LayerStoreManager.class);
-		lsm.manualActivate(rname, configFile);
+		lsm.manualActivate(layerId, configFile);
 
 		ThemeManager tm = dworkspace.getSubsystemManager(ThemeManager.class);
 		tm.shutdown();
@@ -68,68 +72,38 @@ public class ResourceServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		req.setCharacterEncoding(Charset.defaultCharset().displayName());
-		String output = "";
+		
 		res.setContentType("application/json; charset=UTF-8");
 		PrintWriter writer = res.getWriter();
+		
+		String layerId = req.getParameter("layerId");
+		String sld = req.getParameter("sld");
+		String action = req.getParameter("action");
+		
+		if (action.equals("update")) {
+			doUpdateStyle(writer, layerId, sld);			
+		}
+		else if (action.equals("select")) {
+			doGetStyle(writer, layerId);
+		} 
+	}
 
+	private void doGetStyle(PrintWriter writer, String layerId) {
+		String output = "";
 		try {
-			
 			boolean bIsEmpty = false;
-			String rname = req.getParameter("rname");
 
-			if ((rname == null) || (rname.isEmpty())) {
+			if ((layerId == null) || (layerId.isEmpty()))  {
 				output = "{" + "\"message\" : \"'rname' parameter is null or empty.\"" + "}";
 				bIsEmpty = true;
 			}
 			
 			if (!bIsEmpty) {
-				updateResource(rname);
+				output = getStyle(layerId);
 			}
-			/*
-			if (!bIsEmpty) {
-				output = "{\"rtype\" : \"" + rname + "\"}";
-				// DeegreeWorkspace workspace = getServiceWorkspace();
-				// List<ResourceManager> list = workspace.getResourceManagers();
 
-				OWSMetadataProviderManager mgr2 = getServiceWorkspace()
-						.getSubsystemManager(OWSMetadataProviderManager.class);
-				String configRoot = mgr2.getFiles().get(0).getParentFile().getParentFile().getPath();
+			output = "{" + "\"sld\" : \'" + output + "\'" + "}";
 
-				for (ResourceManager mgr : getServiceWorkspace().getResourceManagers()) {
-					ResourceManagerMetadata2 md = ResourceManagerMetadata2.getMetadata(mgr);
-					if (md != null) {
-
-						String mdName = md.getName();
-						String mdCategory = md.getCategory();
-						System.out.println("name : " + mdName);
-						System.out.println("category : " + mdCategory);
-						if (mdName.equals("styles") || mdName.equals("layers")) {
-							File configFile = new File(
-									configRoot + File.separator + mdName + File.separator + rname + ".xml");
-							md.getManager().manualActivate(rname, configFile);
-						}
-						// else if (mdName.equals("themes")) {
-						// File configFile = new File(configRoot +
-						// File.separator + mdName + File.separator +
-						// "theme.xml");
-						// md.getManager().manualActivate(rname, configFile);
-						// }
-						else if (mdName.equals("feature")) {
-							File configFile = new File(configRoot + File.separator + "datasources" + File.separator
-									+ mdName + File.separator + rname + ".xml");
-							md.getManager().manualActivate(rname, configFile);
-						}
-						// else if (mdName.equals("services")) {
-						// File configFile = new File(configRoot +
-						// File.separator + "services" + File.separator +
-						// "wms.xml");
-						// md.getManager().manualActivate("wms", configFile);
-						// }
-					}
-				}
-				OGCFrontController.getInstance().reload();
-			}
-		 	*/
 		} catch (Exception e) {
 			e.printStackTrace();
 			output = "{" + "\"error\" : \"" + e.toString() + "\"" + "}";
@@ -137,6 +111,97 @@ public class ResourceServlet extends HttpServlet {
 			writer.write(output);
 			writer.close();
 		}
+	}
+	
+	private void doUpdateStyle(PrintWriter writer, String layerId, String sld) {
+		String output = "";
+
+		try {
+			boolean bIsEmpty = false;
+
+			if ((layerId == null) || (layerId.isEmpty()))  {
+				output = "{" + "\"message\" : \"'rname' parameter is null or empty.\"" + "}";
+				bIsEmpty = true;
+			}
+			if ((sld == null) || (sld.isEmpty()))  {
+				output = "{" + "\"message\" : \"'sld' parameter is null or empty.\"" + "}";
+				bIsEmpty = true;
+			}
+			
+			if (!bIsEmpty) {
+				output = updateStyle(layerId, sld);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			output = "{" + "\"error\" : \"" + e.toString() + "\"" + "}";
+		} finally {
+			writer.write(output);
+			writer.close();
+		}
+		
+	}
+
+	private synchronized String updateStyle(String layerId, String sld)
+			throws ResourceInitException, IOException, URISyntaxException {
+		String res = "";
+		 res = "{" + "\"error\" : \"" +layerId + " is not exists.\"" + "}";
+		DeegreeWorkspace dworkspace = getServiceWorkspace();
+		OWSMetadataProviderManager mgr2 = dworkspace.getSubsystemManager(OWSMetadataProviderManager.class);
+		String configRoot = mgr2.getFiles().get(0).getParentFile().getParentFile().getPath();
+
+		OGCFrontController.getServiceConfiguration().shutdown();
+
+		File configFile = null;
+
+		configFile = new File(configRoot + File.separator + "styles" + File.separator + layerId + ".xml");
+		
+		if (configFile.exists()) {
+	        BufferedWriter bufwriter = new BufferedWriter(new FileWriter(configFile));
+	        bufwriter.write(sld);
+	        bufwriter.close();
+	        
+			StyleStoreManager ssm = dworkspace.getSubsystemManager(StyleStoreManager.class);
+			ssm.manualActivate(layerId, configFile);
+	
+			configFile = new File(configRoot + File.separator + "layers" + File.separator + layerId + ".xml");
+			LayerStoreManager lsm = dworkspace.getSubsystemManager(LayerStoreManager.class);
+			lsm.manualActivate(layerId, configFile);
+	
+			ThemeManager tm = dworkspace.getSubsystemManager(ThemeManager.class);
+			tm.shutdown();
+			tm.startup(dworkspace);
+	
+			OGCFrontController.getServiceConfiguration().startup(dworkspace);
+			res = "{" + "\"success\" : \"" +layerId + " updated.\"" + "}";
+		}
+		
+		return res;
+	}
+	
+	private synchronized String getStyle(String layerId)
+			throws ResourceInitException, IOException, URISyntaxException {
+		String res = "";
+
+		DeegreeWorkspace dworkspace = getServiceWorkspace();
+		OWSMetadataProviderManager mgr2 = dworkspace.getSubsystemManager(OWSMetadataProviderManager.class);
+		String configRoot = mgr2.getFiles().get(0).getParentFile().getParentFile().getPath();
+
+		File configFile = null;
+
+		configFile = new File(configRoot + File.separator + "styles" + File.separator + layerId + ".xml");
+		
+		//BufferedReader bufreader = new BufferedReader(new FileReader(configFile));
+		BufferedReader bufreader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile),"UTF8"));
+
+		String line = null;
+	    String message = new String();
+	    final StringBuffer buffer = new StringBuffer(2048);
+	    while ((line = bufreader.readLine()) != null) {
+	        // buffer.append(line);
+	        res += line;
+	    }
+
+		return res;
 	}
 
 	@Override

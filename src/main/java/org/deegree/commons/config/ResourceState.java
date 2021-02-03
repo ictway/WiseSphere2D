@@ -68,7 +68,7 @@ public class ResourceState<T extends Resource> {
         destroyed
     }
 
-    private final StateType type;
+    private StateType type;
 
     private final ResourceInitException lastException;
 
@@ -136,6 +136,16 @@ public class ResourceState<T extends Resource> {
     public StateType getType() {
         return type;
     }
+    
+    /**
+     * Returns the state type.(add)
+     * 
+     * @return the state type, never <code>null</code>
+     */
+    public void setType(StateType type) {
+        this.type = type;
+    }
+
 
     /**
      * Returns the actual resource.

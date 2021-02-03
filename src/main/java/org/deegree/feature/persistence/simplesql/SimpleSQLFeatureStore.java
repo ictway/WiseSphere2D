@@ -86,6 +86,11 @@ import org.deegree.feature.types.property.GeometryPropertyType;
 import org.deegree.feature.types.property.SimplePropertyType;
 import org.deegree.feature.utils.DBUtils;
 import org.deegree.filter.FilterEvaluationException;
+import org.deegree.filter.OperatorFilter;
+import org.deegree.filter.comparison.PropertyIsEqualTo;
+import org.deegree.filter.expression.Literal;
+import org.deegree.filter.expression.ValueReference;
+import org.deegree.filter.spatial.DWithin;
 import org.deegree.geometry.Envelope;
 import org.deegree.geometry.Geometry;
 import org.deegree.geometry.GeometryFactory;
@@ -303,8 +308,10 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 			
 			for (final Query q : queries) {
 				Envelope bbox = q.getPrefilterBBoxEnvelope();
+
 				if (bbox == null) {
 					bbox = calcEnvelope(ftName);
+					bbox = getDWithInFilterBbox(q, bbox);
 				}
 
 				Object scaleHint = q.getHint(HINT_SCALE);
@@ -320,6 +327,12 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 					}
 				}
 				//##ictway origin location
+				String attFilter = "";
+				attFilter = getAttFilter(q);
+				
+				if (!attFilter.isEmpty()) {
+					sql += " and " + attFilter + " ";
+				}
 				
 				if (q.getMaxFeatures() > 0 && connType == Type.PostgreSQL) {
 					sql += " limit " + q.getMaxFeatures();
@@ -329,8 +342,8 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 				stmt = conn.prepareStatement(sql);
 				try {
 					//@@ ictway
-					stmt.setMaxRows(100000);
-					stmt.setFetchSize(2000);
+					//stmt.setMaxRows(100000);
+					//stmt.setFetchSize(2000);
 					//@@
 					
 					bbox = transformer.transform(bbox);
@@ -350,15 +363,8 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 				}
 				String bboxString = WKTWriter.write(bbox);
 				stmt.setString(1, bboxString);
-//				 LOG.debug( "Statement to fetch features was '{}'.", connType == Type.Oracle ? sql : stmt );
-//				LOG.info( "[Before] >>>>>>> Wise Sphere  Query Log....==> sql : '{}'. bbox : '{}'", sql, bboxString);
-				//stmt.setQueryTimeout(30);
+				//LOG.info( "-- bbox : '{}'", bboxString);
 				stmt.execute();
-//LOG.info(">>>>>> query executed --- ");				
-				// LOG.debug( " Statement to fetch features was '{}'.", connType
-				// == Type.Oracle ? sql : stmt );
-				// LOG.info( ">>>>>>> [After] Wise Sphere 2018.08.22 Query
-				// Log....==> sql : '{}'. bbox : '{}'", sql, bboxString);
 
 				set = new IteratorFeatureInputStream(new ResultSetIterator<Feature>(stmt.getResultSet(), conn, stmt) {
 
@@ -422,6 +428,70 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 		}
 	}
 
+	private String getAttFilter(Query q) {
+		// TODO Auto-generated method stub
+		String res = "";
+		String leftP = "";
+		String rightP = "";
+		
+		OperatorFilter opFilter = (OperatorFilter)q.getFilter();
+		try {
+			if (opFilter != null) {
+				PropertyIsEqualTo prop = (PropertyIsEqualTo) opFilter.getOperator();
+				if (prop != null) {
+					leftP = ((ValueReference)prop.getParameter1()).getAsText();
+					rightP = ( (Literal<?>) prop.getParameter2() ).getValue().toString();
+					leftP = leftP.substring(leftP.indexOf(':')+1);
+					res = leftP + '=' +'\'' + rightP + '\'';
+				}
+			}
+		} catch (Exception e) {
+			//LOG.info("Data store could not be accessed: '{}'.", e.getLocalizedMessage());
+		} finally {
+			return res;			
+		}
+	}
+
+
+	private Envelope getDWithInFilterBbox(Query q, Envelope bbox) {
+		// TODO Auto-generated method stub
+		Envelope res = bbox;
+		String bboxString = "";
+		double minx = 0.0f;
+		double miny = 0.0f;
+		double maxx = 0.0f;
+		double maxy = 0.0f;
+		
+		OperatorFilter opFilter = (OperatorFilter)q.getFilter();
+		try {
+			if (opFilter != null) {
+				DWithin sop = (DWithin) opFilter.getOperator();
+				double dist = sop.getDistance().getValueAsDouble();
+				
+				if (sop != null) {
+					Geometry geom = sop.getGeometry();
+					geom = transformer.transform(geom);
+
+					minx = geom.getCentroid().get0() - dist;
+					miny = geom.getCentroid().get1() - dist;
+					maxx = geom.getCentroid().get0() + dist;
+					maxy = geom.getCentroid().get1() + dist;
+					
+
+					bboxString = String.format(
+							"POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))",
+							minx, miny,maxx, miny,maxx, maxy,minx, maxy,minx, miny); 
+					Geometry g = new WKTReader(crs).read(bboxString);
+					res = g.getEnvelope();
+				}
+			}
+		} catch (Exception e) {
+			//LOG.info("Data store could not be accessed: '{}'.", e.getLocalizedMessage());
+		} finally {
+			return res;			
+		}
+	}
+	
 	public int queryHits(Query query) throws FeatureStoreException, FilterEvaluationException {
 		// TODO SELECT COUNT
 		return query(query).count();

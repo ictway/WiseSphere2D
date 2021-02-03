@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
@@ -88,23 +93,24 @@ public class JdbcBean {
     public String getDbHost() {
     	String res = "";
     	String strHost = "";
-    	List<String>hostList = Arrays.asList(dbHost.split(","));
-    	
-    	if (hostList.size()>0) {
-	        for (int i=0; i<hostList.size(); i++) {
-	        	strHost = hostList.get(i);
-	
-	        	if (strHost.contains(":"))
-	        		strHost = strHost.substring(0, strHost.indexOf(":"));
-	        	
-	        	res += strHost + ",";
-	        }
-	        
-	        this.dbHost = res.substring(0, res.length()-1);
-    	} else {
-    	    this.dbHost = dbHost;
+    	if (dbHost != null) {
+	    	List<String>hostList = Arrays.asList(dbHost.split(","));
+	    	
+	    	if (hostList.size()>0) {
+		        for (int i=0; i<hostList.size(); i++) {
+		        	strHost = hostList.get(i);
+		
+		        	if (strHost.contains(":"))
+		        		strHost = strHost.substring(0, strHost.indexOf(":"));
+		        	
+		        	res += strHost + ",";
+		        }
+		        
+		        this.dbHost = res.substring(0, res.length()-1);
+	    	} else {
+	    	    this.dbHost = dbHost;
+	    	}
     	}
-    	
         return dbHost;
     }
 
@@ -140,6 +146,12 @@ public class JdbcBean {
             dbPort = "1521";
             //dbConn = "jdbc:oracle:thin:@" + dbHost + ":" + dbPort + ";" + dbName;
             dbConn = "jdbc:oracle:thin:@//" + dbHost + ":" + dbPort + "/" + dbName;
+            return;
+        }
+        if ( dbType.equals( "jeusCP" ) ) {
+            dbPort = "0";
+            dbHost = "NA";
+            dbConn = "NA";
             return;
         }
         if ( dbType.equals( "postgis" ) ) {
@@ -247,8 +259,13 @@ public class JdbcBean {
             if ( dbPort == null || dbPort.isEmpty() ) {
                 dbPort = "1521";
             }
-            //dbConn = "jdbc:oracle:thin:@" + dbHost + ":" + dbPort + ":" + dbName;
+
             dbConn = "jdbc:oracle:thin:@//" + dbHost + ":" + dbPort + "/" + dbName;
+            return;
+        }
+
+        if ( dbType.equals( "jeusCP" ) ) {
+            dbConn = "NA";
             return;
         }
 
@@ -396,36 +413,38 @@ public class JdbcBean {
 		return "/console/jdbc/index?faces-redirect=true";
 	}
 
-    public void testConnection() {
-
+    public void testConnection() throws NamingException {
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sMap = ctx.getSessionMap();
         String newId = (String) sMap.get( "newConfigId" );
         
         Connection conn = null;
         try {
-        	if(dbConn.startsWith("jdbc:Altibase:")){
+        	if(dbType.contains("jeusCP")){
+            	LOG.warn("---@@ jeus Connection Pool -------------------");
+    			InitialContext initCtx = new InitialContext();
+    			String cpName = newId.substring(0, newId.indexOf("."));
+    			DataSource ds = (DataSource)initCtx.lookup(cpName);
+				conn = ds.getConnection();
+            }
+        	else if(dbConn.startsWith("jdbc:Altibase:")){
         		Class.forName("Altibase5.jdbc.driver.AltibaseDriver");
         		Class.forName("Altibase.jdbc.driver.AltibaseDriver");
+            	conn = DriverManager.getConnection( dbConn, dbUser, dbPwd );
         	}
-        	//@@ictway
         	else if(dbConn.startsWith("jdbc:tibero:")){
         		LOG.warn("---@@ tibero Driver -------------------");
         		Class.forName("com.tmax.tibero.jdbc.TbDriver");
         		Class.forName("com.tmax.tibero.jdbc.ext.TbConnectionPoolDataSource");
+            	conn = DriverManager.getConnection( dbConn, dbUser, dbPwd );
         	}
         	
-        	conn = DriverManager.getConnection( dbConn, dbUser, dbPwd );
-        	
-//            FacesMessage fm = new FacesMessage( SEVERITY_INFO, "Connection '" + newId + "' ok", null );
             FacesMessage fm = new FacesMessage( SEVERITY_INFO, "'" + newId + "' 연결 성공", null );
             FacesContext.getCurrentInstance().addMessage( null, fm );
         } catch ( SQLException e ) {
-//            FacesMessage fm = new FacesMessage( SEVERITY_ERROR, "Connection '" + newId + "' unavailable: " + e.getMessage(), null );
             FacesMessage fm = new FacesMessage( SEVERITY_ERROR, "'" + newId + "' 연결을 사용할 수 없습니다(오류내용: " + e.getMessage() + ")", null );
             FacesContext.getCurrentInstance().addMessage( null, fm );
         } catch ( ClassNotFoundException e ) {
-//            FacesMessage fm = new FacesMessage( SEVERITY_ERROR, "Connection '" + newId + "' unavailable: " + e.getMessage(), null );
             FacesMessage fm = new FacesMessage( SEVERITY_ERROR, "'" + newId + "' 연결을 사용할 수 없습니다(오류내용: " + e.getMessage() + ")", null );
             FacesContext.getCurrentInstance().addMessage( null, fm );
 		} finally {
@@ -518,11 +537,18 @@ public class JdbcBean {
 			JDBCConnection ts = (JDBCConnection) jaxbUnmarshaller.unmarshal(file);
 			
 			String url = ts.getUrl();
-			String db_driver = url.substring(url.indexOf("jdbc:")+5, url.indexOf(":",url.indexOf("jdbc:")+5));
+			String db_driver = "";
 			String db_type = "";
 			String db_host = "";
 			String db_port = "";
 			String db_name = "";
+			
+			if (url.contains(":") && url.length()>5) {
+				db_driver = url.substring(url.indexOf("jdbc:")+5, url.indexOf(":",url.indexOf("jdbc:")+5));
+			} else {
+				db_driver = "jeusCP";
+			}
+			
 			if (db_driver.equals("oracle")&&(url.indexOf("thin:@//") >0)) {
 				db_driver = "oracleService";
 			}
@@ -543,6 +569,11 @@ public class JdbcBean {
 				db_host = url.substring(url.indexOf("//")+2, url.indexOf(":", url.indexOf("//")+1));
 				db_name = url.substring(url.lastIndexOf("/")+1);
 				db_port = url.substring(url.indexOf(":",url.indexOf(db_host))+1, url.lastIndexOf("/"));
+			} else if("jeusCP".equals(db_driver)){
+				db_type = "jeusCP";
+				db_name = "NA";
+				db_host = "NA";
+				db_port = "0";
 			} else if("postgresql".equals(db_driver)){
 				db_type = "postgis";
 				db_host = url.substring(url.indexOf("//")+2, url.lastIndexOf(":"));

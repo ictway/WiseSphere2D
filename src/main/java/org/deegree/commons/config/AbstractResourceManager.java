@@ -54,6 +54,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.IOUtils;
+import org.deegree.commons.config.ResourceState.StateType;
 import org.deegree.commons.utils.FileUtils;
 import org.deegree.commons.utils.net.DURL;
 import org.deegree.commons.xml.stax.XMLStreamUtils;
@@ -259,11 +260,23 @@ public abstract class AbstractResourceManager<T extends Resource> extends Abstra
 			LOG.info("Setting up {} '{}' from file '{}'...", new Object[] { name, id, fileName });
 			if (provider != null) {
 				try {
-					T resource = create(id, configFile.toURI().toURL());
+					T resource = null;
+					
+					if (!id.contains(".CP")) {
+						resource = create(id, configFile.toURI().toURL());
+					}
+					
 					state = new ResourceState<T>(id, configFile, provider, created, resource, null);
-					resource.init(workspace);
+
+					if (!id.contains(".CP")) {
+						resource.init(workspace);
+					}
+					
 					state = new ResourceState<T>(id, configFile, provider, init_ok, resource, null);
-					add(resource);
+					
+					if (!id.contains(".CP")) {
+						add(resource);
+					}
 				} catch (ResourceInitException e) {
 					LOG.error("Could not create resource {}: {}", name, e.getLocalizedMessage());
 					if (e.getCause() != null) {

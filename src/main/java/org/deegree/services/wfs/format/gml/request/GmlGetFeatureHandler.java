@@ -154,34 +154,31 @@ import no.ecc.vectortile.VectorTileEncoder;
 public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GmlGetFeatureHandler.class);
-	
+
 	private static CRSFactory factory = new CRSFactory();
-	
+
 	private static Geometry transProj(Geometry geometry, CoordinateReferenceSystem srcCrs,
 			CoordinateReferenceSystem dstCrs) {
 		BasicCoordinateTransform bt = new BasicCoordinateTransform(srcCrs, dstCrs);
-	    GeometryTransformer transformer = new GeometryTransformer() {
-	        @Override
-	        protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent) {
-	            Coordinate[] newCoords = new Coordinate[coords.size()];
-	            for (int i = 0; i < coords.size(); ++i) {
-	                Coordinate coord = coords.getCoordinate(i);
-	                
-	                ProjCoordinate dstProjCoord = new ProjCoordinate();
-					bt.transform(
-							new ProjCoordinate(coord.x,coord.y, 0),
-							dstProjCoord);
+		GeometryTransformer transformer = new GeometryTransformer() {
+			@Override
+			protected CoordinateSequence transformCoordinates(CoordinateSequence coords, Geometry parent) {
+				Coordinate[] newCoords = new Coordinate[coords.size()];
+				for (int i = 0; i < coords.size(); ++i) {
+					Coordinate coord = coords.getCoordinate(i);
+
+					ProjCoordinate dstProjCoord = new ProjCoordinate();
+					bt.transform(new ProjCoordinate(coord.x, coord.y, 0), dstProjCoord);
 
 					newCoords[i] = new Coordinate(dstProjCoord.x, dstProjCoord.y, 0);
-	            }
-	            return new CoordinateArraySequence(newCoords);
-	        }
-	    };
-	    Geometry result = transformer.transform(geometry);
-	    return result;
-	}	
-	
-	
+				}
+				return new CoordinateArraySequence(newCoords);
+			}
+		};
+		Geometry result = transformer.transform(geometry);
+		return result;
+	}
+
 	/**
 	 * Creates a new {@link GmlGetFeatureHandler} instance.
 	 * 
@@ -191,18 +188,17 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 	public GmlGetFeatureHandler(GmlFormat format) {
 		super(format);
 	}
-	
+
 	/**
 	 * Performs the given {@link GetFeature} request.
 	 * 
 	 * @param request
 	 *            request to be handled, never <code>null</code>
 	 * @param response
-	 *            response that is used to write the result, never
-	 *            <code>null</code>
+	 *            response that is used to write the result, never <code>null</code>
 	 */
 	public void doGetFeatureResults(GetFeature request, HttpResponseBuffer response) throws Exception {
-		///@@
+		/// @@
 		LOG.info(">>>>>> Wise Sphere Start : doGetFeatureResults ");
 		LOG.debug("Performing GetFeature (results) request.");
 
@@ -220,7 +216,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 		int traverseXLinkDepth = 0;
 		BigInteger resolveTimeout = null;
 		String xLinkTemplate = getObjectXlinkTemplate(request.getVersion(), gmlVersion);
-		
+
 		if (VERSION_110.equals(request.getVersion()) || VERSION_200.equals(request.getVersion())) {
 			if (request.getResolveParams().getDepth() != null) {
 				if ("*".equals(request.getResolveParams().getDepth())) {
@@ -246,16 +242,135 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			}
 		}
 
-		if ((outputFormat!=null)&&(outputFormat.equals("pbf"))) {
+		if ((outputFormat != null) && (outputFormat.equals("pbf"))) {
 			response.setContentType("application/pbf");
 			ServletOutputStream sos = response.getOutputStream();
 
 			writeFeatureMembersStreamPbf(request.getVersion(), sos, analyzer);
-		} else if ((outputFormat!=null)&&(outputFormat.equals("json"))) {
+		} else if ((outputFormat != null) && (outputFormat.equals("json"))) {
+			// quick check if local references in the output can be ruled out
+			boolean localReferencesPossible = localReferencesPossible(analyzer, traverseXLinkDepth);
+
+			String contentType = options.getMimeType();
+			//XMLStreamWriter xmlStream = WebFeatureService.getXMLResponseWriter(response, contentType, schemaLocation);
+			//xmlStream = new BufferableXMLStreamWriter(xmlStream, xLinkTemplate);
+
+			QName memberElementName = determineFeatureMemberElement(request.getVersion());
+
+			QName responseContainerEl = options.getResponseContainerEl();
+
+			boolean isGetFeatureById = isGetFeatureByIdRequest(request);
+			/*
+			// open "wfs:FeatureCollection" element
+			if (request.getVersion().equals(VERSION_100)) {
+				if (responseContainerEl != null) {
+					xmlStream.setPrefix(responseContainerEl.getPrefix(), responseContainerEl.getNamespaceURI());
+					xmlStream.writeStartElement(responseContainerEl.getNamespaceURI(),
+							responseContainerEl.getLocalPart());
+					xmlStream.writeNamespace(responseContainerEl.getPrefix(), responseContainerEl.getNamespaceURI());
+				} else {
+					xmlStream.setPrefix("wfs", WFS_NS);
+					xmlStream.writeStartElement(WFS_NS, "FeatureCollection");
+					xmlStream.writeNamespace("wfs", WFS_NS);
+					if (lock != null) {
+						xmlStream.writeAttribute("lockId", lock.getId());
+					}
+				}
+			} else if (request.getVersion().equals(VERSION_110)) {
+				if (responseContainerEl != null) {
+					xmlStream.setPrefix(responseContainerEl.getPrefix(), responseContainerEl.getNamespaceURI());
+					xmlStream.writeStartElement(responseContainerEl.getNamespaceURI(),
+							responseContainerEl.getLocalPart());
+					xmlStream.writeNamespace(responseContainerEl.getPrefix(), responseContainerEl.getNamespaceURI());
+				} else {
+					xmlStream.setPrefix("wfs", WFS_NS);
+					xmlStream.writeStartElement(WFS_NS, "FeatureCollection");
+					xmlStream.writeNamespace("wfs", WFS_NS);
+					if (lock != null) {
+						xmlStream.writeAttribute("lockId", lock.getId());
+					}
+					xmlStream.writeAttribute("timeStamp", getTimestamp());
+				}
+			} else if (request.getVersion().equals(VERSION_200) && (!isGetFeatureById)) {
+				xmlStream.setPrefix("wfs", WFS_200_NS);
+				xmlStream.writeStartElement(WFS_200_NS, "FeatureCollection");
+				xmlStream.writeNamespace("wfs", WFS_200_NS);
+				xmlStream.writeAttribute("timeStamp", getTimestamp());
+				if (lock != null) {
+					xmlStream.writeAttribute("lockId", lock.getId());
+				}
+			}
+
+			if (!isGetFeatureById) {
+				// ensure that namespace for feature member elements is bound
+				writeNamespaceIfNotBound(xmlStream, memberElementName.getPrefix(), memberElementName.getNamespaceURI());
+
+				// ensure that namespace for gml (e.g. geometry elements) is
+				// bound
+				writeNamespaceIfNotBound(xmlStream, "gml", gmlVersion.getNamespace());
+
+				if (GML_32 == gmlVersion && !request.getVersion().equals(VERSION_200)) {
+					xmlStream.writeAttribute("gml", GML3_2_NS, "id", "WFS_RESPONSE");
+				}
+			}
+			*/
+
+			int returnMaxFeatures = options.getQueryMaxFeatures();
+			if (request.getPresentationParams().getCount() != null && (options.getQueryMaxFeatures() < 1
+					|| request.getPresentationParams().getCount().intValue() < options.getQueryMaxFeatures())) {
+				returnMaxFeatures = request.getPresentationParams().getCount().intValue();
+			}
+
+			int startIndex = 0;
+			if (request.getPresentationParams().getStartIndex() != null) {
+				startIndex = request.getPresentationParams().getStartIndex().intValue();
+			}
+
+			/*
+			GMLStreamWriter gmlStream = createGMLStreamWriter(gmlVersion, xmlStream);
+			gmlStream.setProjections(analyzer.getProjections());
+			gmlStream.setOutputCrs(analyzer.getRequestedCRS());
+			gmlStream.setCoordinateFormatter(options.getFormatter());
+			gmlStream.setGenerateBoundedByForFeatures(options.isGenerateBoundedByForFeatures());
+			Map<String, String> prefixToNs = new HashMap<String, String>(
+					format.getMaster().getStoreManager().getPrefixToNs());
+			prefixToNs.putAll(getFeatureTypeNsPrefixes(analyzer.getFeatureTypes()));
+			gmlStream.setNamespaceBindings(prefixToNs);
+			GmlXlinkOptions resolveOptions = new GmlXlinkOptions(request.getResolveParams());
+			WfsXlinkStrategy additionalObjects = new WfsXlinkStrategy((BufferableXMLStreamWriter) xmlStream,
+					localReferencesPossible, xLinkTemplate, resolveOptions);
+			gmlStream.setReferenceResolveStrategy(additionalObjects);
+*/
+
 			response.setContentType("application/json");
 			ServletOutputStream sos = response.getOutputStream();
 
-			writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+			if (isGetFeatureById) {
+				//writeSingleFeatureMember(gmlStream, analyzer, resolveOptions);
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+
+			} else if (options.isDisableStreaming()) {
+				//writeFeatureMembersCached(request.getVersion(), gmlStream, analyzer, gmlVersion, returnMaxFeatures,
+				//		startIndex, memberElementName, lock);
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+				
+			} else {
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+			}
+			/*
+			if (!isGetFeatureById) {
+				writeAdditionalObjects(gmlStream, additionalObjects, memberElementName, request.getVersion());
+
+				// close container element
+				xmlStream.writeEndElement();
+			}
+			xmlStream.flush();
+
+			// append buffered parts of the stream
+			if (((BufferableXMLStreamWriter) xmlStream).hasBuffered()) {
+				((BufferableXMLStreamWriter) xmlStream).appendBufferedXML(gmlStream);
+			}
+			*/
 		} else {
 			// quick check if local references in the output can be ruled out
 			boolean localReferencesPossible = localReferencesPossible(analyzer, traverseXLinkDepth);
@@ -372,7 +487,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			}
 		}
 		LOG.info(">>>>>> Wise Sphere End : doGetFeatureResults ");
-		
+
 	}
 
 	public void doGetFeatureHits(GetFeature request, HttpResponseBuffer response)
@@ -478,9 +593,9 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			GMLVersion outputFormat, int maxFeatures, int startIndex, QName featureMemberEl, Lock lock)
 			throws XMLStreamException, UnknownCRSException, TransformationException, FeatureStoreException,
 			FilterEvaluationException, FactoryConfigurationError {
-		//@@ ictway		
-		LOG.info(">>>>> Wise Sphere : Start writeFeatureMembersStream@GmlGetFeatureHandler");		
-		
+		// @@ ictway
+		LOG.info(">>>>> Wise Sphere : Start writeFeatureMembersStream@GmlGetFeatureHandler");
+
 		XMLStreamWriter xmlStream = gmlStream.getXMLStream();
 
 		if (wfsVersion.equals(VERSION_200)) {
@@ -518,24 +633,23 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 		// retrieve and write result features
 		int featuresAdded = 0;
 		int featuresSkipped = 0;
-//@@ ictway		
-//LOG.info(">>>>> Wise Sphere Start gml writing");		
+		// @@ ictway
+		// LOG.info(">>>>> Wise Sphere Start gml writing");
 		GmlXlinkOptions resolveState = gmlStream.getReferenceResolveStrategy().getResolveOptions();
 		for (Map.Entry<FeatureStore, List<Query>> fsToQueries : analyzer.getQueries().entrySet()) {
 			FeatureStore fs = fsToQueries.getKey();
 			Query[] queries = fsToQueries.getValue().toArray(new Query[fsToQueries.getValue().size()]);
 			FeatureInputStream rs = fs.query(queries);
 
-			// @@ ksjang Test 
+			// @@ ksjang Test
 			FeatureCollection fc = rs.toCollection();
 
 			List<Property> list = fc.getProperties();
 			for (int i = 0; i < list.size(); i++) {
 				Property prop = list.get(i);
-				//LOG.debug(prop.getName().toString() + ", " + prop.toString());
+				// LOG.debug(prop.getName().toString() + ", " + prop.toString());
 			}
 			// @@
-
 			try {
 				for (Feature member : rs) {
 					if (lock != null && !lock.isLocked(member.getId())) {
@@ -553,14 +667,14 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 					}
 				}
 			} finally {
-	//@@ ictway		
-	LOG.info(">>>>> Wise Sphere : End writeFeatureMembersStream@GmlGetFeatureHandler");		
-				
+				// @@ ictway
+				LOG.info(">>>>> Wise Sphere : End writeFeatureMembersStream@GmlGetFeatureHandler");
+
 				LOG.debug("Closing FeatureResultSet (stream)");
 				rs.close();
 			}
 		}
-//LOG.info(">>>>> Wise Sphere End gml writing");		
+		// LOG.info(">>>>> Wise Sphere End gml writing");
 	}
 
 	private void writeFeatureMembersStreamPbf(Version wfsVersion, ServletOutputStream sos, QueryAnalyzer analyzer)
@@ -574,7 +688,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			FeatureStore fs = fsToQueries.getKey();
 			Query[] queries = fsToQueries.getValue().toArray(new Query[fsToQueries.getValue().size()]);
 			FeatureInputStream rs = fs.query(queries);
-			
+
 			FeatureType ft = analyzer.getFeatureTypes().iterator().next();
 			QName qn = ft.getName();
 			env = fs.getEnvelope(qn);
@@ -592,7 +706,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			com.vividsolutions.jts.geom.Envelope jenv = new com.vividsolutions.jts.geom.Envelope(p1, p2);
 			com.vividsolutions.jts.geom.GeometryFactory gf = new com.vividsolutions.jts.geom.GeometryFactory();
 			com.vividsolutions.jts.geom.Geometry eg = gf.toGeometry(jenv);
-			
+
 			vte.setClipGeometry(eg);
 
 			// @@ ksjang Test
@@ -621,73 +735,79 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						if (property.get(j) instanceof GenericProperty) {
 							GenericProperty p = (GenericProperty) property.get(j);
 							TypedObjectNode ton = p.getValue();
-							
+
 							if (ton instanceof DefaultMultiPoint) {
 								DefaultMultiPoint dmp = (DefaultMultiPoint) ton;
 								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+								if ((srcAlias.equals("osm_slippy_map") || srcAlias.equals("EPSG:3857")
+										|| srcAlias.equals("EPSG:900913"))
+										&& analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
 									Coordinate[] coords = geom.getCoordinates();
-									for (int m=0; m<coords.length; m++) {
+									for (int m = 0; m < coords.length; m++) {
 										meters2degree(coords[m]);
 									}
-									
+
 									GeometryFactory fact = new GeometryFactory();
 									geom = fact.createMultiPoint(coords);
 								}
-							}
-							else if (ton instanceof DefaultPoint) {
+							} else if (ton instanceof DefaultPoint) {
 								DefaultPoint dmp = (DefaultPoint) ton;
 								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+								if ((srcAlias.equals("osm_slippy_map") || srcAlias.equals("EPSG:3857")
+										|| srcAlias.equals("EPSG:900913"))
+										&& analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
 									Coordinate coord = geom.getCoordinate();
-									
+
 									GeometryFactory fact = new GeometryFactory();
 									geom = fact.createPoint(coord);
 								}
-							}
-							else if (ton instanceof DefaultMultiLineString) {
+							} else if (ton instanceof DefaultMultiLineString) {
 								DefaultMultiLineString dmp = (DefaultMultiLineString) ton;
 								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+								if ((srcAlias.equals("osm_slippy_map") || srcAlias.equals("EPSG:3857")
+										|| srcAlias.equals("EPSG:900913"))
+										&& analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
 									Coordinate[] coords = geom.getCoordinates();
-									for (int m=0; m<coords.length; m++) {
+									for (int m = 0; m < coords.length; m++) {
 										meters2degree(coords[m]);
 									}
-									
+
 									GeometryFactory fact = new GeometryFactory();
 									geom = fact.createLineString(coords);
 								}
-							}
-							else if (ton instanceof DefaultPolygon) {
+							} else if (ton instanceof DefaultPolygon) {
 								DefaultPolygon dmp = (DefaultPolygon) ton;
 								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+								if ((srcAlias.equals("osm_slippy_map") || srcAlias.equals("EPSG:3857")
+										|| srcAlias.equals("EPSG:900913"))
+										&& analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
 									Coordinate[] coords = geom.getCoordinates();
-									for (int m=0; m<coords.length; m++) {
+									for (int m = 0; m < coords.length; m++) {
 										meters2degree(coords[m]);
 									}
-									
+
 									GeometryFactory fact = new GeometryFactory();
 									geom = fact.createPolygon(coords);
 								}
-							}
-							else if (ton instanceof DefaultMultiPolygon) {
+							} else if (ton instanceof DefaultMultiPolygon) {
 								DefaultMultiPolygon dmp = (DefaultMultiPolygon) ton;
 								String srcAlias = dmp.getCoordinateSystem().getAlias();
 								geom = dmp.getJTSGeometry();
-								if ((srcAlias.equals("osm_slippy_map")||srcAlias.equals("EPSG:3857")||srcAlias.equals("EPSG:900913")) && analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
-									Polygon[] polygons = new Polygon[geom.getNumGeometries()]; 
-									for (int m=0; m<geom.getNumGeometries(); m++) {
+								if ((srcAlias.equals("osm_slippy_map") || srcAlias.equals("EPSG:3857")
+										|| srcAlias.equals("EPSG:900913"))
+										&& analyzer.getRequestedCRS().getAlias().equals("EPSG:4326")) {
+									Polygon[] polygons = new Polygon[geom.getNumGeometries()];
+									for (int m = 0; m < geom.getNumGeometries(); m++) {
 										Coordinate[] coords = geom.getGeometryN(m).getCoordinates();
 										meters2degree(coords[m]);
 										GeometryFactory fact = new GeometryFactory();
 										polygons[m] = fact.createPolygon(coords);
 									}
-									
+
 									GeometryFactory fact = new GeometryFactory();
 									geom = fact.createMultiPolygon(polygons);
 								}
@@ -703,7 +823,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 					}
 				}
 				@SuppressWarnings("unchecked")
-				Map<String,?> newMap = (HashMap<String,String>)(Map)attrs;  
+				Map<String, ?> newMap = (HashMap<String, String>) (Map) attrs;
 				vte.addFeature(layerName, newMap, geom);
 			}
 		}
@@ -716,8 +836,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			e.printStackTrace();
 		}
 	}
-	
-	private  void meters2degree(Coordinate coord) {
+
+	private void meters2degree(Coordinate coord) {
 		double radius = 6378137.0;
 		double lon = (180 / Math.PI) * (coord.x / radius);
 		double lat = (360 / Math.PI) * (Math.atan(Math.exp(coord.y / radius)) - (Math.PI / 4));
@@ -785,6 +905,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						TypedObjectNode ton = p.getValue();
 						
 						if (ton instanceof DefaultMultiPoint) {
+							//LOG.info(">>>> Wise Sphere DefaultMultiPoint");
 							DefaultMultiPoint dmp = (DefaultMultiPoint) ton;
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
 
@@ -807,33 +928,10 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								/*
-								int nLen = dmp.size();
-								Point[] polys = new Point[nLen];
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								
-								Coordinate[] coords = geom.getCoordinates();
-								Coordinate[] outCoords = new Coordinate[coords.length];
-								for (int i=0; i<coords.length; i++) {
-									ProjCoordinate dstProjCoord = new ProjCoordinate();
-
-									transformer.transform(
-											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
-											dstProjCoord);
-									outCoords[i] = new Coordinate();
-									outCoords[i].x = dstProjCoord.x;
-									outCoords[i].y = dstProjCoord.y;
-									outCoords[i].z = 0;
-
-									polys[i] = fact.createPoint(outCoords[i]);
-								}
-								
-
-								geom = fact.createMultiPoint(polys);
-								*/
 							}
 						}
 						else if (ton instanceof DefaultPoint) {
+							//LOG.info(">>>> Wise Sphere DefaultPoint");
 							DefaultPoint dmp = (DefaultPoint) ton;
 							
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
@@ -844,29 +942,23 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							if (srcCrs == null) {
 								srcCrs = factory.createFromName(srcAlias);
 							}
-							
+
+							GeometryFactory fact = new GeometryFactory();
 							geom = dmp.getJTSGeometry();
-							
-							if (!srcCrs.equals(dstCrs)) { 
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								Coordinate coords = geom.getCoordinate();
-								ProjCoordinate dstProjCoord = new ProjCoordinate();
-								Coordinate outCoords = new Coordinate();
-								
-								transformer.transform(new ProjCoordinate(coords.x,coords.y,coords.z), 
-										dstProjCoord);
-								
-								outCoords = new Coordinate();
-								outCoords.x = dstProjCoord.x;
-								outCoords.y = dstProjCoord.y;
-								outCoords.z = 0;
-								
-								GeometryFactory fact = new GeometryFactory();
-								
-								geom = fact.createPoint(outCoords);
+							if (!srcCrs.equals(dstCrs)) {
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}								
 							}
 						}
 						else if (ton instanceof DefaultLineString) {
+							//LOG.info(">>>> Wise Sphere DefaultLineString");
 							DefaultLineString dmp = (DefaultLineString) ton;
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
 							
@@ -876,30 +968,23 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							if (srcCrs == null) {
 								srcCrs = factory.createFromName(srcAlias);
 							}
-							
-							geom = dmp.getJTSGeometry();
-							
-							if (!srcCrs.equals(dstCrs)) { 
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								Coordinate[] coords = geom.getCoordinates();
-								Coordinate[] outCoords = new Coordinate[coords.length];
-								for (int i=0; i<coords.length; i++) {
-									ProjCoordinate dstProjCoord = new ProjCoordinate();
-									transformer.transform(
-											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
-											dstProjCoord);
-									outCoords[i] = new Coordinate();
-									outCoords[i].x = dstProjCoord.x;
-									outCoords[i].y = dstProjCoord.y;
-									outCoords[i].z = 0;
-								}
 
-								GeometryFactory fact = new GeometryFactory();
-								
-								geom = fact.createLineString(outCoords);
+							GeometryFactory fact = new GeometryFactory();
+							geom = dmp.getJTSGeometry();
+							if (!srcCrs.equals(dstCrs)) {
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}								
 							}
 						}
 						else if (ton instanceof DefaultMultiLineString) {
+							//LOG.info(">>>> Wise Sphere DefaultMultiLineString");
 							DefaultMultiLineString dmp = (DefaultMultiLineString) ton;
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
 
@@ -922,31 +1007,10 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}								
-								/*
-								int nLen = dmp.size();
-								LineString[] polys = new LineString[nLen];
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								
-								Coordinate[] coords = geom.getCoordinates();
-								Coordinate[] outCoords = new Coordinate[coords.length];
-								for (int i=0; i<coords.length; i++) {
-									ProjCoordinate dstProjCoord = new ProjCoordinate();
-									transformer.transform(
-											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
-											dstProjCoord);
-									outCoords[i] = new Coordinate();
-									outCoords[i].x = dstProjCoord.x;
-									outCoords[i].y = dstProjCoord.y;
-									outCoords[i].z = 0;
-
-								}
-								polys[0] = fact.createLineString(outCoords);
-
-								geom = fact.createMultiLineString(polys);
-								*/
 							}
 						}
 						else if (ton instanceof DefaultPolygon) {
+							//LOG.info(">>>> Wise Sphere DefaultPolygon");
 							DefaultPolygon dmp = (DefaultPolygon) ton;
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
 							
@@ -956,30 +1020,24 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 							if (srcCrs == null) {
 								srcCrs = factory.createFromName(srcAlias);
 							}
-							
-							geom = dmp.getJTSGeometry();
-							
-							if (!srcCrs.equals(dstCrs)) { 
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								Coordinate[] coords = geom.getCoordinates();
-								Coordinate[] outCoords = new Coordinate[coords.length];
-								for (int i=0; i<coords.length; i++) {
-									ProjCoordinate dstProjCoord = new ProjCoordinate();
-									transformer.transform(
-											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
-											dstProjCoord);
-									outCoords[i] = new Coordinate();
-									outCoords[i].x = dstProjCoord.x;
-									outCoords[i].y = dstProjCoord.y;
-									outCoords[i].z = 0;
-								}
 
-								GeometryFactory fact = new GeometryFactory();
-								
-								geom = fact.createPolygon(outCoords);
+							GeometryFactory fact = new GeometryFactory();
+							geom = dmp.getJTSGeometry();
+							if (!srcCrs.equals(dstCrs)) { 
+								//int nLen = dmp.size();
+								WKTReader wktReader = new WKTReader();
+								String geomS = geom.toString();
+								try {
+									geom = wktReader.read(geomS);
+									geom = transProj(geom, srcCrs, dstCrs);
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						}
 						else if (ton instanceof DefaultMultiPolygon) {
+							//LOG.info(">>>> Wise Sphere DefaultMultiPolygon");
 							DefaultMultiPolygon dmp = (DefaultMultiPolygon) ton;
 							CRSCodeType[] codec = dmp.getCoordinateSystem().getCodes();
 
@@ -1003,27 +1061,6 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								/*
-								Polygon[] polys = new Polygon[nLen];
-								BasicCoordinateTransform transformer = new BasicCoordinateTransform(srcCrs, dstCrs);
-								
-								Coordinate[] coords = geom.getCoordinates();
-								Coordinate[] outCoords = new Coordinate[coords.length];
-								for (int i=0; i<coords.length; i++) {
-									ProjCoordinate dstProjCoord = new ProjCoordinate();
-									transformer.transform(
-											new ProjCoordinate(coords[i].x,coords[i].y,coords[i].z),
-											dstProjCoord);
-									outCoords[i] = new Coordinate();
-									outCoords[i].x = dstProjCoord.x;
-									outCoords[i].y = dstProjCoord.y;
-									outCoords[i].z = 0;
-
-								}
-								polys[0] = fact.createPolygon(outCoords);
-
-								geom = fact.createMultiPolygon(polys);
-								*/
 							}
 						}
 					} else if (property.get(j) instanceof SimpleProperty) {
@@ -1088,33 +1125,34 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			e.printStackTrace();
 		} 
 	}	
-
 	private void writeFeatureMembersCached(Version wfsVersion, GMLStreamWriter gmlStream, QueryAnalyzer analyzer,
 			GMLVersion outputFormat, int maxFeatures, int startIndex, QName featureMemberEl, Lock lock)
 			throws XMLStreamException, UnknownCRSException, TransformationException, FeatureStoreException,
 			FilterEvaluationException, FactoryConfigurationError {
 
-//LOG.info(">>>> Wise Sphere writeFeatureMembersCached #01");		
+		// LOG.info(">>>> Wise Sphere writeFeatureMembersCached #01");
 		FeatureCollection allFeatures = new GenericFeatureCollection();
 		Set<String> fids = new HashSet<String>();
 
 		// retrieve maxfeatures features
 		int featuresAdded = 0;
 		int featuresSkipped = 0;
-		//LOG.info(">>>> Wise Sphere writeFeatureMembersCached #02");		
+		// LOG.info(">>>> Wise Sphere writeFeatureMembersCached #02");
 		for (Map.Entry<FeatureStore, List<Query>> fsToQueries : analyzer.getQueries().entrySet()) {
 			FeatureStore fs = fsToQueries.getKey();
 			Query[] queries = fsToQueries.getValue().toArray(new Query[fsToQueries.getValue().size()]);
 			FeatureInputStream rs = fs.query(queries);
 			try {
-				//for (Feature feature : rs) {
+				// for (Feature feature : rs) {
 				Iterator<Feature> itr = rs.iterator();
 
-				//int idx = 0;
-//LOG.info(">>>> Wise Sphere writeFeatureMembersCached #03-0");
-//LOG.info(">>>> Wise Sphere writeFeatureMembersCached Count : " + Integer.toString(rs.count()));
+				// int idx = 0;
+				// LOG.info(">>>> Wise Sphere writeFeatureMembersCached #03-0");
+				// LOG.info(">>>> Wise Sphere writeFeatureMembersCached Count : " +
+				// Integer.toString(rs.count()));
 				while (itr.hasNext()) {
-					//LOG.info(">>>> Wise Sphere writeFeatureMembersCached #03-2->>" + Integer.toString(idx++));
+					// LOG.info(">>>> Wise Sphere writeFeatureMembersCached #03-2->>" +
+					// Integer.toString(idx++));
 					Feature feature = itr.next();
 
 					if (lock != null && !lock.isLocked(feature.getId())) {
@@ -1131,7 +1169,7 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 						featuresAdded++;
 					}
 				}
-				//LOG.info(">>>> Wise Sphere writeFeatureMembersCached #04");				
+				// LOG.info(">>>> Wise Sphere writeFeatureMembersCached #04");
 			} finally {
 				LOG.debug("Closing FeatureResultSet (cached)");
 				rs.close();
