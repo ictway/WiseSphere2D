@@ -88,6 +88,12 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>updateGeom</servlet-name>
+		<servlet-class>com.ictway.wisesphere.services.custom.GeometryServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
 	
 	
 	<servlet-mapping>
@@ -131,7 +137,10 @@
 		<url-pattern>/services/customResource/*</url-pattern>
 	</servlet-mapping>
 	
-	
+	<servlet-mapping>
+		<servlet-name>updateGeom</servlet-name>
+		<url-pattern>/services/updateGeom/*</url-pattern>
+	</servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>console.xhtml</welcome-file>

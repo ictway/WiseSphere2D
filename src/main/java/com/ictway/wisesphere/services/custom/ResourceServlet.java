@@ -32,9 +32,6 @@ import org.deegree.style.persistence.StyleStoreManager;
 import org.deegree.theme.persistence.ThemeManager;
 import org.slf4j.Logger;
 
-/**
- * @author ksjang 2016. 11. 27. ResourceServlet.java
- */
 public class ResourceServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -901785500425786189L;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jeus-web-dd xmlns="http://www.tmaxsoft.com/xml/ns/jeus" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.tmaxsoft.com/xml/ns/jeus jeus-web-dd.xsd" 
+	version="8.0">
+    <!-- context-path>/ServletProjectTest</context-path -->
+    <auto-reload>
+       <enable-reload>true</enable-reload>
+       <use-jvm-hotswap>true</use-jvm-hotswap>
+       <check-on-demand>true</check-on-demand>
+    </auto-reload>
+</jeus-web-dd>
