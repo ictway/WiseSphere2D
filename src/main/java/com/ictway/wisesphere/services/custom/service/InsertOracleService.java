@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
@@ -52,9 +53,12 @@ public class InsertOracleService implements GeometryDBService {
 			initFeatureConnection(layerId);
 			//columnList 설정
 			ArrayList<String> columnList = getColumnList(cList);
-			String sql = getSql(tableName,json,srid,geomName,columnList,seqName,seqColName);
+			if(!Optional.ofNullable(srid).isPresent()) {
+				srid="4326";
+			}
+			String sql = getSql(tableName,json,geomName,columnList,seqName,seqColName,srid);
 			//insert 실행
-			int insertedRow = updateFeature(sql);
+			int insertedRow = updateFeature(sql); //좌표계 입력이 없을 경우
 			closeConnection();
 			result.addProperty("message", "success");
 			result.addProperty("tableName", tableName);
@@ -106,7 +110,7 @@ public class InsertOracleService implements GeometryDBService {
 		this.conn.close();
 	}
 	
-	private String getSql(String layerId,String json,String srid,String geomName,ArrayList<String> columnList,String seqName,String seqColName) throws Exception {
+	private String getSql(String layerId,String json,String geomName,ArrayList<String> columnList,String seqName,String seqColName,String srid) throws Exception {
 		// # 1. 변수 초기화
 		String sql = "INSERT INTO " + layerId + "("; // 반환될 sql문이 저장되는 변수
 		String valueStr="VALUES (";
@@ -126,8 +130,8 @@ public class InsertOracleService implements GeometryDBService {
 		Map map = gson.fromJson(properties, Map.class);
 		// map의 key부분을 이용하여 result 부분 완성 , values에 각각의 value를 추가
 		ArrayList<String> incorrectColumns=new ArrayList<>(); //잘못된 컬럼을 저장
-		//시퀸스를 사용하지 않을 때
-		if((seqName !=null || !seqName.isEmpty())&&(seqColName != null || !seqColName.isEmpty())) {
+		//시퀸스를 사용할 때
+		if(true) {//gagaga
 			sql += seqColName+","; // result에 sql문 일부 추가
 			valueStr += seqName+".NEXTVAL,";
 		}
@@ -145,11 +149,11 @@ public class InsertOracleService implements GeometryDBService {
 		sql += geomName+") ";
 		valueStr += "SDO_CS.TRANSFORM(SDO_UTIL.FROM_GEOJSON(?),?))";
 		values.add(geometry.toString());
-		values.add(srid);
 		LOG.info(sql+valueStr);
 		return sql+valueStr;
 	}	
 
+	//사용자가 입력한 데이터를 기반으로 컬럼리스트를 반환
 	@Override
 	public ArrayList<String> getColumnList(String[] cList) throws Exception {
 		// TODO Auto-generated method stub
@@ -158,8 +162,9 @@ public class InsertOracleService implements GeometryDBService {
 		return columnList;
 	}
 
+	//DB를 통해서 컬럼리스트를 반환
 	@Override
-	public ArrayList<String> getColumnListFromDB(String layerId) throws Exception {
+	public ArrayList<String> getColumnListFromDB(String tableName) throws Exception {
 		// TODO Auto-generated method stub
 		//초기화
 		ArrayList<String> arrayList = new ArrayList<>();
@@ -168,7 +173,7 @@ public class InsertOracleService implements GeometryDBService {
 		//sql실행
 		try {
 			PreparedStatement pstmt = this.conn.prepareStatement(sql);
-			pstmt.setString(1, layerId);
+			pstmt.setString(1, tableName);
 			//select 수행
 			ResultSet resultSet=pstmt.executeQuery();
 			//데이터 arrayList에 저장
@@ -195,22 +200,18 @@ public class InsertOracleService implements GeometryDBService {
 		return null;
 	}
 
+	//좌표계가 설정되어 있지 않았을 경우 EPSG4326으로 설정
 	@Override
 	public int updateFeature(String sql) throws Exception {
 		// TODO Auto-generated method stub
-		// #2. Connection Pool에서 connection 가져오기
-		// #3. prepareStatement 초기화
+		// #1. prepareStatement 초기화
 		PreparedStatement pstmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-		// #4. 파라미터 설정(setString)
+		// #2. 파라미터 설정(setString)
 		int i = 1;
 		for (String value : this.values) {
-			if(i==this.values.size()) {
-				pstmt.setInt(i++, Integer.parseInt(value));
-			}else {
-				pstmt.setString(i++, value);
-			}
+			pstmt.setString(i++, value);
 		}
-		// #5. update SQL 실행 결과값 가져오기
+		// #3. update SQL 실행 결과값 가져오기
 		return pstmt.executeUpdate(); //updateRow : 수정된 로우의 개수
 	}
 

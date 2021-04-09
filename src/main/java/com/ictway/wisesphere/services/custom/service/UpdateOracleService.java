@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
@@ -56,9 +57,13 @@ public class UpdateOracleService implements GeometryDBService {
 			ArrayList<String> columnList = getColumnList(cList);
 			//ArrayList<String> columnList = getColumnListFromDB(layerId);
 			//sql문 생성
-			String sql = getSql(tableName,wClause,json,srid,geomName,columnList);
+			if(!Optional.ofNullable(srid).isPresent()){
+				srid="4326"; //srid가 널일 경우 4326좌표계 사용
+			}
+			String sql = getSql(tableName,wClause,json,geomName,columnList,srid);
 			//update 실행
 			int updatedRow = updateFeature(sql);
+			//연결해제
 			closeConnection();
 			result.addProperty("message", "success");
 			result.addProperty("tableName", tableName);
@@ -73,6 +78,7 @@ public class UpdateOracleService implements GeometryDBService {
 		return result;
 	}
 	
+	//DB 연결
 	@Override
 	public void initFeatureConnection(String featureId)
 			throws NamingException, SQLException, MalformedURLException, JAXBException {
@@ -89,12 +95,14 @@ public class UpdateOracleService implements GeometryDBService {
 			
 		DeegreeWorkspace workspace = getServiceWorkspace();
 		
+		//featureId와 동일한 xml파일 읽기
 		File featureFile = new File(workspace.getLocation(), "/datasources/feature/" + featureId + ".xml");
 		
 		SimpleSQLFeatureStoreConfig config;
         config = (SimpleSQLFeatureStoreConfig) JAXBUtils.unmarshall( 
         		CONFIG_JAXB_PACKAGE, CONFIG_SCHEMA, featureFile.toURI().toURL(),workspace );	
         
+        //jdbc 연결
         String connId = config.getConnectionPoolId();
         if ( connId == null ) {
             connId = config.getJDBCConnId();
@@ -110,9 +118,9 @@ public class UpdateOracleService implements GeometryDBService {
 
 	}
 	
-	// sql set 부분 만드는 메소드
+	// sql 만드는 메소드
 	//
-	private String getSql(String layerId,String wClause,String json,String srid,String geomName,ArrayList<String> columnList) throws Exception {
+	private String getSql(String layerId,String wClause,String json,String geomName,ArrayList<String> columnList,String srid) throws Exception {
 		// # 1. 변수 초기화
 		String sql = "update " + layerId + " set "; // 반환될 sql문이 저장되는 변수
 		this.values = new ArrayList<String>();
@@ -143,9 +151,8 @@ public class UpdateOracleService implements GeometryDBService {
 		}
 		
 		// geom 추가
-		sql += geomName + "= SDO_CS.TRANSFORM(SDO_UTIL.FROM_GEOJSON(?),?) ";
+		sql += geomName + "= SDO_CS.TRANSFORM(SDO_UTIL.FROM_GEOJSON(?),"+srid+") ";
 		values.add(geometry.toString());
-		values.add(srid);
 		sql+="where "+wClause;
 		return sql;
 	}
@@ -159,11 +166,7 @@ public class UpdateOracleService implements GeometryDBService {
 		// #4. 파라미터 설정(setString)
 		int i = 1;
 		for (String value : this.values) {
-			if(i==this.values.size()) {
-				pstmt.setInt(i++, Integer.parseInt(value));
-			}else {
-				pstmt.setString(i++, value);
-			}
+			pstmt.setString(i++, value);
 		}
 		// #5. update SQL 실행 결과값 가져오기
 		return pstmt.executeUpdate(); //updateRow : 수정된 로우의 개수
