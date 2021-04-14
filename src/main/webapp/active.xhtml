@@ -12,7 +12,7 @@
 	        <h:panelGroup id="header" layout="block">
 				<h:panelGroup id="logo">
 					<h:panelGroup styleClass="submenu" layout="block"
-						rendered="#{logBean.loggedIn}">
+						rendered="#{logBean.loggedIn}"> <!-- 로그인 할 경우 다시 로드 기능 추가 -->
 						<h:form>
 							<h:outputText styleClass="menutopic" value="#{labels.active_workspace}" />
 							<h:outputText value="#{workspace.activeWorkspace.name}" />
@@ -23,6 +23,9 @@
 							<h:commandButton value="#{labels.apply_changes}"
 								styleClass="btn btn-warning" style="margin-left:10px;" action="#{workspace.applyChanges}"
 								onclick="show();" rendered="#{workspace.pendingChanges}" />
+							<h:commandButton value="WFS 일괄등록"
+								styleClass="btn btn-primary" style="margin-left:10px;" action="#{workspace.registerWFS}"
+								onclick="register_click" rendered="#{!workspace.pendingChanges}"/>
 						</h:form>
 					</h:panelGroup>
 				</h:panelGroup>
@@ -30,4 +33,12 @@
 				</h:panelGroup>
 			</h:panelGroup>
 </ui:composition>
+<script type="text/javascript"> 
+	function register_click(){
+		<![CDATA[
+		window.alert("WFS");
+		]]>
+	}
+</script>
+
 </html>
