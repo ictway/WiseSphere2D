@@ -40,12 +40,8 @@ import static java.util.Arrays.asList;
 import static org.deegree.commons.utils.CollectionUtils.removeDuplicates;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
