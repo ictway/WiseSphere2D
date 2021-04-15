@@ -15,7 +15,74 @@
 * method : POST
 * url : http://{serverIp}:{port}/ws/services/updateGeom
 * request
-  * l
+  * action – type : String, required : true, ("update" 입력)
+  *	layerId – type : String, required : true, (데이터를 변경하려는 레이어명)
+  *	tableName –type: String, required : true, (데이터를 변경하려는 테이블명)
+  *	wClause – type : String, required : true, (데이터를 변경하기 위한 sql의 where절)
+  * srid – type : string, required : true, (좌표계 설정)
+  *	json – type : String, required : true, (데이터를 변경하기 위한 geoJson, type : feature)
+  *	geomName – type : String, required : false, (json의 geometry가 'geometry'로 설정되지 않았을 경우 설정)
+  *	columnList – type : array, required : true, (변경하려는 properties 속성을 명시)
+* response
+  * 성공
+    * status : 200 OK
+    * Message (json)
+      * message : 'success'
+      * tableName : (변경된 테이블명)
+      * updatedRow : (변경된 row의 개수)
+  * 실패
+    * status : 406
+    * Message (json)
+      * message : 'fail'
+      * tableName : (변경을 시도한 테이블명)
+      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
+### insert
+* method : POST
+* url : http://{serverIp}:{port}/ws/services/updateGeom
+* request
+  * action – type : String, required : true, ("insert" 입력)
+  *	layerId – type : String, required : true, (데이터를 변경하려는 레이어명)
+  *	tableName –type: String, required : true, (데이터를 변경하려는 테이블명)
+  * srid – type : string, required : true, (좌표계 설정)
+  * seqName : type : string : required : false (시퀸스 명)
+  * seqColName : type : string : required : false (시퀸스를 적용할 필드명) 
+  *	json – type : String, required : true, (데이터를 변경하기 위한 geoJson, type : feature)
+  *	geomName – type : String, required : false, (json의 geometry가 'geometry'로 설정되지 않았을 경우 설정)
+  *	columnList – type : array, required : true, (변경하려는 properties 속성을 명시)
+* response
+  * 성공
+    * status : 200 OK
+    * Message (json)
+      * message : 'success'
+      * tableName : (변경된 테이블명)
+      * insertedRow : (변경된 row의 개수)
+  * 실패
+    * status : 406
+    * Message (json)
+      * message : 'fail'
+      * tableName : (변경을 시도한 테이블명)
+      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
+### delete
+* method : POST
+* url : http://{serverIp}:{port}/ws/services/updateGeom
+* request
+  * action – type : String, required : true, ("insert" 입력)
+  *	layerId – type : String, required : true, (데이터를 변경하려는 레이어명)
+  *	tableName –type: String, required : true, (데이터를 변경하려는 테이블명)
+  * wClause – type : String, required : true, (데이터를 변경하기 위한 sql의 where절)
+* response
+  * 성공
+    * status : 200 OK
+    * Message (json)
+      * message : 'success'
+      * tableName : (변경된 테이블명)
+      * deletedRow : (변경된 row의 개수)
+  * 실패
+    * status : 406
+    * Message (json)
+      * message : 'fail'
+      * tableName : (변경을 시도한 테이블명)
+      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
   
 ## class & interface
 * GeometryServlet
@@ -31,7 +98,7 @@
     * discriminationAction
       * 개요 : request의 action 파라미터를 사용하여 switch문을 통해 적합한 서비스에 연결합니다.
       * parameter : HttpServletRequest
-      * return value :  JsonObject**(사용자에게 제공될 메시지)**
+      * return value :  JsonObject **(사용자에게 제공될 메시지) **
 * GeometryDBService
   * 사용자가 필요로 하는 서비스들의 interface입니다.
   * package : com.ictway.wisesphere.services.custom.service
@@ -69,7 +136,7 @@
       * return value : void
   * 하위 클래스
     * UpdateOracleService
-      * 레이어 요소를 업데이트 하는 서비스입니다.
+      * 레이어 요소를 업데이트하는 서비스입니다.
       * package : com.ictway.wisesphere.services.custom.service
       * method
         * process
@@ -93,11 +160,88 @@
           * 개요 : overriding
         * getColumnList
           * 개요 : overriding
-        ColumnListFromDB
+        * ColumnListFromDB
+          * 개요 : overriding
+        * closeConnection
+          * 개요 : overriding
+    * InsertOracleService
+      * 레이어 요소를 추가하는 서비스입니다.
+      * package : com.ictway.wisesphere.services.custom.service
+      * method
+        * process
+          * GeometryDBService의 process를 오버로딩
+          * parameter : String layerId,String tableName,String json,String srid,String geomName,String[] cList, String seqName, String seqColName
+            * seqName : sequence명
+            * seqColName : sequence를 사용하는 table의 column명
+          * **동일한 파라미터는 앞으로 생략**
+        * initFeatureConnection
+          * 개요 : overriding
+        * getSql
+          * 상속받은 getSql을 overloading
+          * parameter : String layerId,String json,String geomName,ArrayList<String> columnList,String seqName,String seqColName,String srid
+        * updateFeature
+          * 개요 : overriding
+        * getColumnList
+          * 개요 : overriding
+        * ColumnListFromDB
+          * 개요 : overriding
+        * closeConnection
+          * 개요 : overriding
+    * DeleteOracleService
+      * 레이어 요소를 삭제하는 서비스입니다.
+      * package : com.ictway.wisesphere.services.custom.service
+      * method
+        * process
+          * GeometryDBService의 process를 오버로딩
+          * parameter : String layerId,String tableName,String wClause
+          * **동일한 파라미터는 앞으로 생략**
+        * initFeatureConnection
+          * 개요 : overriding
+        * getSql
+          * 상속받은 getSql을 overloading
+          * parameter : String layerId,String wClause
+        * updateFeature
+          * 개요 : overriding
+        * getColumnList
+          * 개요 : overriding
+        * ColumnListFromDB
+          * 개요 : overriding
+        * closeConnection
+          * 개요 : overriding
+    * DeleteOracleGeomService
+      * 레이어 요소를 geometry 정보를 이용하여 삭제하는 서비스입니다.
+      * ** 권한문제로 현재 미완성 ** 
+      * package : com.ictway.wisesphere.services.custom.service
+      * method
+        * process
+          * GeometryDBService의 process를 오버로딩
+          * parameter : String layerId,String json,String geomName
+          * **동일한 파라미터는 앞으로 생략**
+        * initFeatureConnection
+          * 개요 : overriding
+        * getSql
+          * 개요 : overriding
+        * updateFeature
+          * 개요 : overriding
+        * getColumnList
+          * 개요 : overriding
+        * ColumnListFromDB
+          * 개요 : overriding
+        * closeConnection
           * 개요 : overriding
           
-    
-  * 해당 인터페이스는 다음과 같은 클래스에 상속됩니다.
-    * UpdateOracleService
-      * 개요 : 사용자의 요청을 기반으로 update문을 만들어 레이어에 feature를 추가합니다.
-      
+## Test Case
+## update
+### point
+'''javascript
+var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
+var params = {
+	action:"update",
+	layerId:"rider_4326",
+	tableName:"rider_4326",
+	wClause:"ID='r03'",
+	srid: ‘4326’,
+	json:'{ "type": "Feature", "properties": { "id": "r03", "latitude": 136.57504119873, "longitude": 39.395057678222699, "time": "2021-03-15T14:20:54" }, "geometry": { "type": "Point", "coordinates": [ 124.675041198730469, 35.385057678222656 ] } }',
+columnList : ['latitude','longitude']};
+$.post(url, params);
+'''
