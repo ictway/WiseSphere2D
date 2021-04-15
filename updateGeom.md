@@ -7,5 +7,5 @@
 - [x] update
 - [x] insert
 - [x] delete
-- [] delete(Geometry 기반)
+- [ ] delete(Geometry 기반)
    
