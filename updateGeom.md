@@ -35,7 +35,7 @@
     * Message (json)
       * message : 'fail'
       * tableName : (변경을 시도한 테이블명)
-      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
+      * error : error 코드 **(보안을 위해 추후 변경 바람)**
 ### insert
 * method : POST
 * url : http://{serverIp}:{port}/ws/services/updateGeom
@@ -61,7 +61,7 @@
     * Message (json)
       * message : 'fail'
       * tableName : (변경을 시도한 테이블명)
-      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
+      * error : error 코드 **(보안을 위해 추후 변경 바람)**
 ### delete
 * method : POST
 * url : http://{serverIp}:{port}/ws/services/updateGeom
@@ -82,7 +82,7 @@
     * Message (json)
       * message : 'fail'
       * tableName : (변경을 시도한 테이블명)
-      * error : error 코드 ( ** 보안을 위해 추후 변경 바람 ** )
+      * error : error 코드 **(보안을 위해 추후 변경 바람)**
   
 ## class & interface
 * GeometryServlet
@@ -98,7 +98,7 @@
     * discriminationAction
       * 개요 : request의 action 파라미터를 사용하여 switch문을 통해 적합한 서비스에 연결합니다.
       * parameter : HttpServletRequest
-      * return value :  JsonObject **(사용자에게 제공될 메시지) **
+      * return value :  JsonObject **(사용자에게 제공될 메시지)**
 * GeometryDBService
   * 사용자가 필요로 하는 서비스들의 interface입니다.
   * package : com.ictway.wisesphere.services.custom.service
@@ -233,44 +233,37 @@
 ## Test Case
 ## update
 ### point
-'''javascript
-var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
-var params = {
+    var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
+    var params = {
 	action:"update",
 	layerId:"rider_4326",
 	tableName:"rider_4326",
 	wClause:"ID='r03'",
 	srid: '4326',
 	json:'{ "type": "Feature", "properties": { "id": "r03", "latitude": 136.57504119873, "longitude": 39.395057678222699, "time": "2021-03-15T14:20:54" }, "geometry": { "type": "Point", "coordinates": [ 124.675041198730469, 35.385057678222656 ] } }',
-columnList : ['latitude','longitude']};
-$.post(url, params);
-'''
+    columnList : ['latitude','longitude']};
+    $.post(url, params);
 ### line
-'''javascript
-var url = "http://192.168.0.47:8380/ws/services/updateGeom";
-var params = {
-	action:"update",
-	layerId:"line",
-	tableName:"line_5186",
-	wClause : "GID=1",
-	srid:'5186',
-	geomName:"geom",
-	json:'{ "type": "Feature", "properties": {"id":"test02","name":"test033"}, "geometry": { "type": "LineString", "coordinates": [ [ 125.90557861328125, 34.23907530202184 ], [ 	125.408447265625, 36.59127365634205 ], [ 126.32305908203125, 36.71907231552909 ] ] } }',
-	columnList : ['id','name']
-};
-$.post(url, params);
+    var url = "http://192.168.0.47:8380/ws/services/updateGeom";
+    var params = {
+	    action:"update",
+	    layerId:"line",
+	    tableName:"line_5186",
+	    wClause : "GID=1",
+	    srid:'5186',
+	    geomName:"geom",
+	    json:'{ "type": "Feature", "properties": {"id":"test02","name":"test033"}, "geometry": { "type": "LineString", "coordinates": [ [ 125.90557861328125, 34.23907530202184 ], [ 	125.408447265625, 36.59127365634205 ], [ 126.32305908203125, 36.71907231552909 ] ] } }',
+	    columnList : ['id','name']
+    };
+    $.post(url, params);
 '''
 ### polygon
-'''
-var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
-var params = {
-	action:"update",
-	layerId:"korea_4326",
-	tableName:"korea_4326",
-	wClause:"GID_0='KOR'",
-	srid : '4326',
-	json:'{"id":"layerId0","type":"Feature","properties":{"NAME_0":"kor19_test"},"geometry":{"coordinates":[[[125.97303456,37.55291035],[125.96802104075867,38.55547579329156],[125.18857116,38.55213956],[126.99303456,37.55291035]]],"type":"Polygon"}}',
-	columnList : ['GID_0','NAME_0']};
-$.post(url, params);
-
-'''
+    var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
+    var params = {
+    	action:"update",
+    	layerId:"korea_4326",
+    	tableName:"korea_4326",
+    	wClause:"GID_0='KOR'",
+    	srid : '4326',
+	json:'{"id":"layerId0","type":"Feature","properties":{"NAME_0":"kor19_test"},"geometry":{"coordinates":[[[125.97303456,37.55291035],[125.96802104075867,38.55547579329156],[125.18857116,38.55213956],[126.99303456,37.55291035]]],"type":"Polygon"}}',columnList : ['GID_0','NAME_0']};
+    $.post(url, params);
