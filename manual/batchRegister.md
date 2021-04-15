@@ -8,9 +8,9 @@ theme.xml에 등록된 레이어목록을 읽어와 wfs.xml에 일괄적으로 �
   1. 수정되기 전의 wfs.xml
     - ![phase1](./img/phase1.png)
   1. WFS 일괄등록 버튼 누름 
-    - ![phase1](./img/phase2.png)
+     - ![phase1](./img/phase2.png)
   1. wfs.xml 수정
-     - ![phase1](./img/phase3.png)
+      - ![phase1](./img/phase3.png)
   1. wfs.xml의 동일한 위치에 백업 파일 생성
 ## class
  **SpWFSUpdateXml**

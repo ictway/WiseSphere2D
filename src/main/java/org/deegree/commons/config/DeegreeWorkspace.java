@@ -40,7 +40,12 @@ import static java.util.Arrays.asList;
 import static org.deegree.commons.utils.CollectionUtils.removeDuplicates;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -235,6 +240,7 @@ public class DeegreeWorkspace {
                 }
             }
         }
+        
 
         // fourth, order dependencies using fixed point method
         LinkedList<ResourceManager> order = new LinkedList<ResourceManager>( map.keySet() );
@@ -425,6 +431,7 @@ public class DeegreeWorkspace {
     /**
      * @return the root directory for workspaces
      */
+    
     public static String getWorkspaceRoot() {
         String workspaceRoot = System.getProperty( VAR_WORKSPACE_ROOT );
         if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
@@ -436,7 +443,7 @@ public class DeegreeWorkspace {
             workspaceRoot = System.getProperty( "user.home" ) + separator + ".wisesphere";
 //            workspaceRoot = System.getProperty( "user.dir" ) + separator + ".ws";
         }
-        return workspaceRoot;
+        return workspaceRoot; //이부분 코드 변경할 경우 root 위치 변환 가능
     }
 
     /**
