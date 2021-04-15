@@ -235,12 +235,12 @@
 ### point
     var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
     var params = {
-	action:"update",
-	layerId:"rider_4326",
-	tableName:"rider_4326",
-	wClause:"ID='r03'",
-	srid: '4326',
-	json:'{ "type": "Feature", "properties": { "id": "r03", "latitude": 136.57504119873, "longitude": 39.395057678222699, "time": "2021-03-15T14:20:54" }, "geometry": { "type": "Point", "coordinates": [ 124.675041198730469, 35.385057678222656 ] } }',
+	    action:"update",
+	    layerId:"rider_4326",
+	    tableName:"rider_4326",
+	    wClause:"ID='r03'",
+	    srid: '4326',
+	    json:'{ "type": "Feature", "properties": { "id": "r03", "latitude": 136.57504119873, "longitude": 39.395057678222699, "time": "2021-03-15T14:20:54" }, "geometry": { "type": "Point", "coordinates": [ 124.675041198730469, 35.385057678222656 ] } }',
     columnList : ['latitude','longitude']};
     $.post(url, params);
 ### line
@@ -256,7 +256,6 @@
 	    columnList : ['id','name']
     };
     $.post(url, params);
-'''
 ### polygon
     var url = " http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom ";
     var params = {
@@ -265,5 +264,78 @@
     	tableName:"korea_4326",
     	wClause:"GID_0='KOR'",
     	srid : '4326',
-	json:'{"id":"layerId0","type":"Feature","properties":{"NAME_0":"kor19_test"},"geometry":{"coordinates":[[[125.97303456,37.55291035],[125.96802104075867,38.55547579329156],[125.18857116,38.55213956],[126.99303456,37.55291035]]],"type":"Polygon"}}',columnList : ['GID_0','NAME_0']};
+	   json:'{"id":"layerId0","type":"Feature","properties":{"NAME_0":"kor19_test"},"geometry":{"coordinates":[[[125.97303456,37.55291035],[125.96802104075867,38.55547579329156],[125.18857116,38.55213956],[126.99303456,37.55291035]]],"type":"Polygon"}}',columnList : ['GID_0','NAME_0']};
     $.post(url, params);
+## insert
+### point
+    var url = "http://192.168.0.47:8380/ws/services/updateGeom";
+    var params = {
+        action:"insert",
+        layerId:"point",
+        tableName:"point_5186",
+        srid:'5186',
+        seqName:"SEQPOINT",
+        seqColName:"name",
+        json:'{ "type": "Feature", "properties": {"name":"test01"}, "geometry": { "type": "Point", "coordinates": [ 127.111572265625, 36.14718209972376 ] } }',
+        columnList : ['name']
+    };
+    $.post(url, params);
+### line
+    var url = "http://192.168.0.47:8380/ws/services/updateGeom";
+    var params = {
+        action:"insert",
+        layerId:"line",
+        tableName:"line_5186",
+        srid:'5186',
+        seqName:"SEQLINE",
+        seqColName:"GID",
+        geomName:"geom",
+        json:'{ "type": "Feature", "properties": {"id":"c03","name":"test03"}, "geometry": { "type": "LineString","coordinates": [ [ 126.90557861328125, 34.23907530202184 ], [ 125.408447265625, 34.59127365634205 ], [ 124.32305908203125, 36.71907231552909 ] ] } }',
+        columnList : ['id','name']
+    };
+    $.post(url, params);
+### polygon
+    var url = "http://192.168.0.47:8380/ws/services/updateGeom";
+    var params = {
+        action:"insert",
+        layerId:"polygon",
+        tableName:"polygon_5186",
+        srid:'5186',
+        seqName:"SEQLINE",
+        seqColName:"GID",
+        geomName:"geom",
+        json:'{ "type": "Feature", "properties": {"id":"c02","name":"test01"}, "geometry": { "type": "Polygon", "coordinates": [ [ [ 127.51693725585938, 37.03983207971425 ], [ 127.33978271484375, 36.855449936136495 ], [ 124.64053344726562, 36.8510544475565 ], [ 126.51693725585938, 37.03983207971425 ] ] ] } }',
+        columnList : ['id','name']
+    };
+    $.post(url, params);
+## delete
+### point
+    var url = "http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom";
+    var params = {
+        action:"delete",
+        layerId:"rider_4326",
+        tableName:"rider_4326",
+        wClause:"id='c02'"
+    };
+    $.post(url, params);
+### line
+    var url = "http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom";
+    var params = {
+        action:"delete",
+        layerId:"road_4326",
+        tableName:”road_4326”,
+        wClause:"UFID='105261'"
+    };
+    $.post(url, params);
+### polygon
+    var url = "http://192.168.0.137:8808/wise-sphere-2d/services/updateGeom";
+    var params = {
+        action:"delete",
+        layerId:"korea_4326",
+        tableName:”korea_4326”,
+        wClause:"GID_0='test01'"
+    };
+    $.post(url, params);
+
+
+
