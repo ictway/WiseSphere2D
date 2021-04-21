@@ -131,9 +131,15 @@ public class InsertOracleService implements GeometryDBService {
 		// map의 key부분을 이용하여 result 부분 완성 , values에 각각의 value를 추가
 		ArrayList<String> incorrectColumns=new ArrayList<>(); //잘못된 컬럼을 저장
 		//시퀸스를 사용할 때
-		if(true) {//gagaga
+		if(Optional.ofNullable(seqColName).isPresent() && Optional.ofNullable(seqName).isPresent()) {//sequence 존재 여부 확인 경우)
 			sql += seqColName+","; // result에 sql문 일부 추가
-			valueStr += seqName+".NEXTVAL,";
+			int val = selectSeqNextVal(seqName);
+			if(val > 0) {
+				valueStr += selectSeqNextVal(seqName) + ",";
+			}else {
+				LOG.error("error occured about sequence");
+				return null;
+			}
 		}
 		for (Object key : map.keySet()) {
 			String k = (String) key;
@@ -147,11 +153,27 @@ public class InsertOracleService implements GeometryDBService {
 		}
 		// geom 추가
 		sql += geomName+") ";
-		valueStr += "SDO_CS.TRANSFORM(SDO_UTIL.FROM_GEOJSON(?),?))";
+		valueStr += "SDO_CS.TRANSFORM(SDO_UTIL.FROM_GEOJSON(?)," + srid + "))";
 		values.add(geometry.toString());
-		LOG.info(sql+valueStr);
 		return sql+valueStr;
 	}	
+	
+	//2021-04-21
+	//sequence 간접 사용
+	private int selectSeqNextVal(String seqName) {
+		try {
+			String sql = "SELECT "+seqName+".NEXTVAL FROM DUAL";
+			PreparedStatement sqlStatement = this.conn.prepareStatement(sql);
+			ResultSet rs = sqlStatement.executeQuery();
+			rs.next();
+			return rs.getInt(1);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+	}
 
 	//사용자가 입력한 데이터를 기반으로 컬럼리스트를 반환
 	@Override
