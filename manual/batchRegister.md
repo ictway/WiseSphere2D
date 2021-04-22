@@ -6,19 +6,11 @@ theme.xml에 등록된 레이어목록을 읽어와 wfs.xml에 일괄적으로 �
 
 ## 사용방법
   1. 수정되기 전의 wfs.xml
-<<<<<<< HEAD
     - ![phase1](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase01.png)
   1. WFS 일괄등록 버튼 누름 
      - ![phase2](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase02.png)
   1. wfs.xml 수정
       - ![phase3](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase03.png)
-=======
-     - ![phase1](/img/phase1.png)
-  1. WFS 일괄등록 버튼 누름 
-     - ![phase2](/img/phase2.png)
-  1. wfs.xml 수정
-     - ![phase3](/img/phase3.png)
->>>>>>> 2f8483aa502cb55d169284b80f104f869c111d1a
   1. wfs.xml의 동일한 위치에 백업 파일 생성
 ## class
  **SpWFSUpdateXml**
