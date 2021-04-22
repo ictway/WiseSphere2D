@@ -9,6 +9,12 @@
 - [x] insert
 - [x] delete
 - [ ] delete(Geometry 기반)
+
+## 패치노트
+### 2021-04-22
+* insert 시 SQLRecoverableException 문제 해결
+  * 시퀸스 처리 부분을 select문으로 따로 처리되도록 수정
+  * 시퀸스 처리 할 때 에러가 발생할 경우 로그를 통해 확인 가능하도록 수정
   
 ## API 명세
 ### update
