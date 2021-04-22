@@ -162,11 +162,11 @@ public class InsertOracleService implements GeometryDBService {
 	//sequence 간접 사용
 	private int selectSeqNextVal(String seqName) {
 		try {
-			String sql = "SELECT "+seqName+".NEXTVAL FROM DUAL";
+			String sql = "SELECT "+seqName+".NEXTVAL FROM DUAL"; //sql문 생성 (시퀸스 증가)
 			PreparedStatement sqlStatement = this.conn.prepareStatement(sql);
-			ResultSet rs = sqlStatement.executeQuery();
+			ResultSet rs = sqlStatement.executeQuery(); //sql문 실행
 			rs.next();
-			return rs.getInt(1);
+			return rs.getInt(1); //nextVal의 값 반환
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
