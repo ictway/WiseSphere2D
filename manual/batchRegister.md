@@ -6,11 +6,19 @@ theme.xml에 등록된 레이어목록을 읽어와 wfs.xml에 일괄적으로 �
 
 ## 사용방법
   1. 수정되기 전의 wfs.xml
+<<<<<<< HEAD
     - ![phase1](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase01.png)
   1. WFS 일괄등록 버튼 누름 
      - ![phase2](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase02.png)
   1. wfs.xml 수정
       - ![phase3](https://github.com/dku32131738/WiseSphere2D/blob/master/manual/img/phase03.png)
+=======
+     - ![phase1](/img/phase1.png)
+  1. WFS 일괄등록 버튼 누름 
+     - ![phase2](/img/phase2.png)
+  1. wfs.xml 수정
+     - ![phase3](/img/phase3.png)
+>>>>>>> 2f8483aa502cb55d169284b80f104f869c111d1a
   1. wfs.xml의 동일한 위치에 백업 파일 생성
 ## class
  **SpWFSUpdateXml**
@@ -38,3 +46,15 @@ theme.xml에 등록된 레이어목록을 읽어와 wfs.xml에 일괄적으로 �
       * updateFeatureStore를 실행한 후 다시 로드 수행
       * parameter : void
       * return value : String
+  **WorkspaceBean**
+   * workspace의 데이터를 읽고 페이지의 기능을 처리
+   * package : org.deegree.console
+   * 추가 사항 : registerWFS
+     - SpWFSUpdateXml 클래스를 호출하여 일괄 등록 기능 수행
+     - 레이어를 추가 후 applyChanges(다시 로드) 실행
+
+## resource
+ **active.xhtml**
+   * location : /src/main/webapp/active.xhtml
+   * 기능 : 화면 상단에 위치하여 다시 로드 버튼이 존재, 로그인 시 확인 가능
+   * 추가 사항 : WFS 일괄 버튼 추가 (WorkspaceBean 클래스와 연결)
