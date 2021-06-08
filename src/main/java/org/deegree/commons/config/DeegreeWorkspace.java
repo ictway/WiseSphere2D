@@ -440,11 +440,11 @@ public class DeegreeWorkspace {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			workspaceRoot = null;
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		} catch (IOException e) {
 			workspaceRoot = null;
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
         if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
             workspaceRoot = System.getenv( VAR_WORKSPACE_ROOT );
