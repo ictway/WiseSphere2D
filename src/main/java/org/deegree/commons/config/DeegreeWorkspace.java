@@ -42,6 +42,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,6 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -429,7 +431,21 @@ public class DeegreeWorkspace {
      */
     
     public static String getWorkspaceRoot() {
-        String workspaceRoot = System.getProperty( VAR_WORKSPACE_ROOT );
+    	String workspaceRoot;
+      	try {
+    		Properties properties = new Properties();
+    		String path = DeegreeWorkspace.class.getResource("root.properties").getPath();
+			properties.load(new FileReader(path));
+			workspaceRoot = properties.getProperty("location");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			workspaceRoot = null;
+			e.printStackTrace();
+		} catch (IOException e) {
+			workspaceRoot = null;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
             workspaceRoot = System.getenv( VAR_WORKSPACE_ROOT );
         }
