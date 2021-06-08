@@ -42,6 +42,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,6 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -429,9 +431,7 @@ public class DeegreeWorkspace {
      */
     
     public static String getWorkspaceRoot() {
-<<<<<<< HEAD
-        String workspaceRoot = System.getProperty( VAR_WORKSPACE_ROOT );
-=======
+        
     	String workspaceRoot; //.wisesphere 경로
       	try {
     		Properties properties = new Properties();
@@ -447,7 +447,7 @@ public class DeegreeWorkspace {
 			// TODO Auto-generated catch block
 			LOG.error(e.getMessage());
 		}
->>>>>>> leejb
+
         if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
             workspaceRoot = System.getenv( VAR_WORKSPACE_ROOT ); // VAR_WORKSPACE_ROOT = static 변수
         }
