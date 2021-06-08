@@ -431,28 +431,28 @@ public class DeegreeWorkspace {
      */
     
     public static String getWorkspaceRoot() {
-    	String workspaceRoot;
+    	String workspaceRoot; //.wisesphere 경로
       	try {
     		Properties properties = new Properties();
-    		String path = DeegreeWorkspace.class.getResource("root.properties").getPath();
-			properties.load(new FileReader(path));
-			workspaceRoot = properties.getProperty("location");
+    		String path = DeegreeWorkspace.class.getResource("../../../../../root.properties").getPath(); //properties 파일 경로 가져오기 WEB-INF
+			properties.load(new FileReader(path)); //properties 읽기
+			workspaceRoot = properties.getProperty("location"); //location 변수 읽기
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			workspaceRoot = null;
+			workspaceRoot = null; //properties가 존재하지 않을 경우
 			LOG.error(e.getMessage());
 		} catch (IOException e) {
-			workspaceRoot = null;
+			workspaceRoot = null; //파일 읽기 실패
 			// TODO Auto-generated catch block
 			LOG.error(e.getMessage());
 		}
         if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
-            workspaceRoot = System.getenv( VAR_WORKSPACE_ROOT );
+            workspaceRoot = System.getenv( VAR_WORKSPACE_ROOT ); // VAR_WORKSPACE_ROOT = static 변수
         }
-        if ( workspaceRoot == null || workspaceRoot.isEmpty() ) {
+        if ( workspaceRoot == null || workspaceRoot.isEmpty() ) { //default lacation =
 // workspace change...BY_JIN
 //            workspaceRoot = System.getProperty( "user.home" ) + separator + ".deegree";
-            workspaceRoot = System.getProperty( "user.home" ) + separator + ".wisesphere";
+            workspaceRoot = System.getProperty( "user.home" ) + separator + ".wisesphere"; //사용자 폴더 : .wisesphere
 //            workspaceRoot = System.getProperty( "user.dir" ) + separator + ".ws";
         }
         return workspaceRoot; //이부분 코드 변경할 경우 root 위치 변환 가능
