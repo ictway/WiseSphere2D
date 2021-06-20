@@ -93,7 +93,7 @@ public class XMLValueMangler {
             break;
         }
         case DATE_TIME: {
-            value = parseDateTime( s );
+            value = parseDateTime( s.replace(' ', 'T')  );
             break;
         }
         case DECIMAL: {
