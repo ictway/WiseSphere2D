@@ -171,9 +171,9 @@ public class ThreadedFeatureInputStream implements FeatureInputStream {
                     LOG.debug( "Got interrupted." );
                 }
             } finally {
-                finished = true;
-                rs.close();
-
+            	finished = true;
+                rs.close(); //wms close (2)
+                
                 // Consumer may still be waiting for more input
                 synchronized ( this ) {
                     notify();
@@ -221,6 +221,7 @@ public class ThreadedFeatureInputStream implements FeatureInputStream {
 
         private void exit() {
             exitRequested = true;
+            rs.close();
             if ( sleeping ) {
                 synchronized ( this ) {
                     notify();
