@@ -145,7 +145,14 @@
 													<h:commandButton styleClass="btn btn-primary" value="#{labels.xmlEditor_save}" onclick="save()" action="${editConfig.save}" />
 												</h:panelGroup>	
 												
-												
+											</td>
+											<td>
+												<h:panelGroup rendered="#{configManager.currentResourceManager.name == 'feature'}">
+													<h:commandButton styleClass="btn btn-primary" value="OnlyFeature" onclick="save()" action="${spConfigManager.saveOnlyFeature}">
+														<f:setPropertyActionListener target="#{actionParams.param1}" value="#{configManager}" />
+														<f:setPropertyActionListener target="#{actionParams.param2}" value="#{editConfig}" />
+													</h:commandButton>
+												</h:panelGroup>
 											</td>
 										</tr>
 									</table>	

@@ -148,6 +148,21 @@ public class ConfigManager extends org.deegree.console.ConfigManager implements 
         return defaultCharacterEncoding;
     }
     
+    public String saveOnlyFeature() throws IllegalArgumentException, IOException { //Feature만 수정할 경우 - style, theme 변화 없음
+		this.configManger = (org.deegree.console.ConfigManager) getParam1();
+		this.config = (Config) getParam2();
+		
+		this.id = config.getId();
+		this.configType = this.configManger.getNewConfigType();
+		this.currentResourceManager = configManger.getCurrentResourceManager();
+    	
+    	/*feature 등록*/
+		this.config.setAutoActivate(false);
+		String returnVal = this.config.save();
+
+		return returnVal;
+    }
+    
     public String saveFeture() {
     	try {
     		this.configManger = (org.deegree.console.ConfigManager) getParam1();

@@ -47,10 +47,12 @@ import static java.sql.Types.NUMERIC;
 import static java.sql.Types.OTHER;
 import static java.sql.Types.SMALLINT;
 import static java.sql.Types.VARCHAR;
+import static java.sql.Types.TIMESTAMP;
 import static org.deegree.commons.jdbc.ConnectionManager.getConnection;
 import static org.deegree.commons.tom.primitive.BaseType.BOOLEAN;
 import static org.deegree.commons.tom.primitive.BaseType.DECIMAL;
 import static org.deegree.commons.tom.primitive.BaseType.STRING;
+import static org.deegree.commons.tom.primitive.BaseType.DATE_TIME;
 import static org.deegree.feature.types.property.GeometryPropertyType.CoordinateDimension.DIM_2_OR_3;
 import static org.deegree.feature.types.property.GeometryPropertyType.GeometryType.GEOMETRY;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -136,6 +138,9 @@ public class DBUtils {
                 case BIT:
                     pt = new SimplePropertyType( ptName, 0, 1, BOOLEAN, null, null );
                     break;
+                case TIMESTAMP:
+                	pt = new SimplePropertyType( ptName, 0, 1, DATE_TIME, null, null);
+                	break;
                 case NUMERIC:
                 case DOUBLE:
                 case BIGINT:
