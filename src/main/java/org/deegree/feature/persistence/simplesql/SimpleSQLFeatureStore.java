@@ -418,11 +418,13 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 			LOG.info("Data store could not be accessed: '{}'.", e.getLocalizedMessage());
 			LOG.trace("Stack trace:", e);
 			available = false;
+			JDBCUtils.close(null, stmt, conn, LOG);
 			throw new FeatureStoreException("Data store could not be accessed.");
 		} catch (Exception e) {
 			LOG.info("Data store could not be accessed: '{}'.", e.getLocalizedMessage());
 			LOG.trace("Stack trace:", e);
 			available = false;
+			JDBCUtils.close(null, stmt, conn, LOG);
 			throw new FeatureStoreException("Error Occurred...");
 		} finally {
 			//@@ictway
