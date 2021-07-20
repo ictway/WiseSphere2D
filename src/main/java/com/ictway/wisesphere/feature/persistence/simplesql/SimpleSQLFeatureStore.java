@@ -323,7 +323,10 @@ public class SimpleSQLFeatureStore implements FeatureStore {
 
 				if (q.getMaxFeatures() > 0 && connType == Type.PostgreSQL) {
 					sql += " limit " + q.getMaxFeatures();
-				}
+				} 
+				else if (q.getMaxFeatures() > 0 && connType == Type.Oracle){
+					sql += "  and rownum <= " + q.getMaxFeatures();
+				} 
 
 				stmt = conn.prepareStatement(sql);
 				try {

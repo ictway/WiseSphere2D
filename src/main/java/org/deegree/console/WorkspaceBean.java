@@ -74,6 +74,8 @@ import org.deegree.services.controller.OGCFrontController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ictway.wisesphere.services.wfs.SpWFSUpdateXml;
+
 /**
  * JSF Bean for controlling various global aspects of the {@link DeegreeWorkspace}.
  * 
@@ -259,6 +261,19 @@ public class WorkspaceBean implements Serializable {
             configManager.refresh();
         }
         return ctx.getViewRoot().getViewId();
+    }
+    
+    //WFS 일괄 등록
+    public String registerWFS() {
+    	
+    	SpWFSUpdateXml spWFSUpdateXml = new SpWFSUpdateXml();
+    	try {
+    		spWFSUpdateXml.updateFeatureStore();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	return applyChanges();
+    	
     }
 
     public void downloadWorkspace() {

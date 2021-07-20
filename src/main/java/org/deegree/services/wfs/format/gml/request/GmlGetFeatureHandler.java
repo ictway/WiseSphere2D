@@ -347,15 +347,15 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 
 			if (isGetFeatureById) {
 				//writeSingleFeatureMember(gmlStream, analyzer, resolveOptions);
-				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer, returnMaxFeatures);
 
 			} else if (options.isDisableStreaming()) {
 				//writeFeatureMembersCached(request.getVersion(), gmlStream, analyzer, gmlVersion, returnMaxFeatures,
 				//		startIndex, memberElementName, lock);
-				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer, returnMaxFeatures);
 				
 			} else {
-				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer);
+				writeFeatureMembersStreamJson(request.getVersion(), sos, analyzer, returnMaxFeatures);
 			}
 			/*
 			if (!isGetFeatureById) {
@@ -846,7 +846,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 		coord.z = 0;
 	}
 
-	private void writeFeatureMembersStreamJson(Version wfsVersion, ServletOutputStream sos, QueryAnalyzer analyzer)
+	private void writeFeatureMembersStreamJson(Version wfsVersion, ServletOutputStream sos, QueryAnalyzer analyzer,
+			int returnMaxFeatures)
 			throws XMLStreamException, UnknownCRSException, TransformationException, FeatureStoreException,
 			FilterEvaluationException, FactoryConfigurationError, IOException {
 		Envelope env = null;
@@ -891,6 +892,8 @@ public class GmlGetFeatureHandler extends AbstractGmlRequestHandler {
 			Iterator<Feature> itr = rs.iterator();
 			while (itr.hasNext()) {
 				Feature feature = itr.next();
+				
+				if (rowIdx >= returnMaxFeatures) break; //here
 
 				List<Property> property = feature.getProperties();
 				com.vividsolutions.jts.geom.Geometry geom = null;
